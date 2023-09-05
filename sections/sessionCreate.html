@@ -1,0 +1,44 @@
+
+<template class="task-template">
+  <div id="login-template" class="login-two">
+      <section>
+        <div class="row">
+          <span class="login-two-logo">
+            <img src="./assets/img/logo1.png">
+          </span>
+            <span class="h1">
+                Login to your account
+            </span>
+        </div>   
+          <span class="h2">
+              Enter your username and password
+          </span>
+        <div class="row form-wrapper">
+        <div id="sessionCreate">
+          <div id="formError"></div>
+          <div class="row">
+            <div class="inputLabel">Username:</div>
+            <div><input type="text" name="username" placeholder="Username" /></div>
+          </div>
+          <div class="row">
+            <div class="inputLabel">Password:</div>
+            <div><input type="password" name="password" placeholder="*********" /></div>
+          </div>
+          <div class="ctaWrapper login-section">
+              <button type="button" id="login-btn" data-modal="initial-page" class="blue login">Login</button>
+              <!-- <a href="./sections/sessionCreate.1.html" class="cta blue">Get Started</a> -->
+            </div>       
+        </div>
+        </div>
+        <div class="copyright">
+            <span style="margin-left: 20%;">&copy copyright 2019 - 2023 <br/></span>
+            All Rights Reserved - www.twelveinks.com
+          </div>
+        <script>
+            require('../renderer-process/login.js');
+            require('../assets/js/app.js');
+        </script>
+        <a id="close" href="javascript:window.close()">Close</a>
+      </section> 
+</div>
+</template>

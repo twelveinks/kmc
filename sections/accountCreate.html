@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/vendor/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.js"></script>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap-datepicker-1.6.4-dist/css/bootstrap-datepicker.css">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script> -->
+    <script>if (window.module) module = window.module;</script>
+
+</head>
+<body class="index-2">
+  <div id="create-user" class="create user"></div>
+  <section>
+      <h1>Create Your Account</h1>
+      <h2>Signup is easy and only takes a few seconds.</h2>
+
+      <div class="formWrapper">
+        <div id="accountCreate">
+          <div id="formErro"></div>
+          <div class="inputWrapper">
+            <div class="inputLabel">First Name</div>
+            <input type="text" name="firstName" placeholder="John" />
+          </div>
+          <div class="inputWrapper">
+            <div class="inputLabel">Last Name</div>
+            <input type="text" name="lastName" placeholder="Smith" />
+          </div>
+          <div class="inputWrapper">
+            <div class="inputLabel">Username</div>
+            <input type="text" name="userName" placeholder="Username" />
+          </div>
+          <div class="inputWrapper">
+            <div class="inputLabel">Choose a Password</div>
+            <input type="password" name="password" placeholder="Make it a good one!" />
+          </div>
+          <div class="inputWrapper">
+            <div class="inputLabel">Confirm Password</div>
+            <input type="password" name="confirmPass" placeholder="***************" />
+          </div>
+          <div class="inputWrapper ctaWrapper">
+            <button class="cta green createAccount">Create Account</button>
+          </div>
+        </div>
+      </div>
+      <script>
+          require('../renderer-process/createUser.js');
+      </script>
+  </section>
+</div>
+</body>
+</html>

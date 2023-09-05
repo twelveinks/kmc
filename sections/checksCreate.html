@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/vendor/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.js"></script>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap-datepicker-1.6.4-dist/css/bootstrap-datepicker.css">
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script> -->
+    <script>if (window.module) module = window.module;</script>
+
+</head>
+
+<body class="index-2">
+    <div class="col-md-12 col-lg-12 col-sm-12 medical-information">
+        <h5>
+            <span class="underline">Medic</span>al information
+        </h5>
+        <div class="row ">
+            <!-- divs to handle patient information -->
+            <div class="col-md-4">
+                <form class="needs-validation" novalidate>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Patient No.</span>
+                        </div>
+                        <input type='tel' pattern="[0-9\-]+" class="form-control patient_no" id="patient_no"
+                            placeholder="Patient Number" min="1" max="1000000" required>
+                        <div class="invalid-tooltip-1">
+                            Please provide a valid Patient Number.
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">First Name</span>
+                        </div>
+                        <input type="text" class="form-control firstName" id="firstName" placeholder="First Name"
+                            required>
+                        <div class="invalid-tooltip-2">
+                            Please provide a valid First Name.
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Last Name</span>
+                        </div>
+                        <input type="text" class="form-control lastName" id="lastName" placeholder="Last Name" required>
+                        <div class="invalid-tooltip-3">
+                            Please provide a valid Last Name.
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Gender</span>
+                        </div>
+                        <select class="form-control" id="gender" placeholder="Select your Gender" required>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Age</span>
+                        </div>
+                        <input type="number" class="form-control age" id="age" placeholder="Age" min="1" max="150"
+                            required>
+                        <div class="invalid-tooltip-4">
+                            Please provide a valid Age.
+                        </div>
+                    </div>
+
+                    <div class="input-group" id="sandbox-container">
+                        <div class="input-group date" required>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Date-Time</span>
+                                </div>
+                                <input class="form-control date" type="text" id='date' placeholder="Date"><span
+                                    class="input-group-addon"><img class="calender"
+                                        src="../assets/img/calendar-alt-solid.svg" /></span>
+                                <div class="invalid-tooltip-5">
+                                    Please select a valid date.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            </form>
+            <div class="col-md-4">
+                <form class="needs-validation" novalidate>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Pre-Op Diagnosis/<br /> Indication</span>
+
+                        </div>
+                        <textarea id='pre-op' class="form-control pre-op" maxlength="400" rows="5" col="50"
+                            aria-label="With textarea"></textarea>
+                        <div class="invalid-tooltip-6">
+                            Please provide a valid Pre-op.
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Scopic Findings</span>
+                        </div>
+                        <textarea id='scopic-findings' class="form-control scopic-findings" maxlength="600" rows="5"
+                            col="50" aria-label="With textarea"></textarea>
+                        <div class="invalid-tooltip-7">
+                            Please provide valid scopic findings.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form class="needs-validation" novalidate>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Scopic Diagnosis</span>
+                        </div>
+                        <textarea id='scopic-diagnosis' class="form-control scopic-diagnosis" maxlength="100" rows="4"
+                            col="50" aria-label="With textarea"></textarea>
+                        <div class="invalid-tooltip-8">
+                            Please provide a valid scopic diagnosis.
+                        </div>
+                    </div>
+                </form>
+                <form>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Biopsy Site</span>
+                        </div>
+                        <textarea type="text" class="form-control biopay" id="biopay"
+                            placeholder="Procedure Done / Biopsy Site" maxlength="50" rows="2" required></textarea>
+                        <div class="invalid-tooltip-9">
+                            Please provide a valid Biopsy Site.
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row downrow">
+        <!-- divs to handle browse images -->
+        <div class="col-md-7 col-lg-7 col-sm-6 images-container ">
+            <div class="browse-images">
+                <h5>
+                    <span class="underline-2">Brow</span>se Images
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 " id='figure-group1'>
+                        <figure class="figure1">
+                            <div class="img-container">
+                                <img src="../assets/img/noimage.jpg" id="fig1" class="figure-img  rounded"
+                                    alt="A generic square placeholder image with rounded corners in a figure.">
+                            </div>
+
+                            <input type="file" id="imageInput1" style="display: none;">
+                            <button class="importsingleimage" id="importImageButton1">Edit Image</button>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">1.</span>
+                                </div>
+                                <input type="text" class="form-control figure-caption" id="fig1Caption"
+                                    placeholder="Insert Caption">
+                            </div>
+                        </figure>
+                        <figure class="figure1">
+                            <div class="img-container">
+                                <img src="../assets/img/noimage.jpg" id="fig2" class="figure-img  rounded"
+                                    alt="A generic square placeholder image with rounded corners in a figure.">
+                            </div>
+
+                            <input type="file" id="imageInput2" style="display: none;">
+                            <button class="importsingleimage" id="importImageButton2">Edit Image</button>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">2.</span>
+                                </div>
+                                <input type="text" class="form-control figure-caption" id="fig2Caption"
+                                    placeholder="Insert Caption">
+                            </div>
+                        </figure>
+                    </div>
+
+                    <div class="col-md-4" id='figure-group2'>
+                        <figure class="figure1">
+                            <div class="img-container">
+                                <img src="../assets/img/noimage.jpg" id="fig3" class="figure-img  rounded"
+                                    alt="A generic square placeholder image with rounded corners in a figure.">
+                            </div>
+
+                            <input type="file" id="imageInput3" style="display: none;">
+                            <button class="importsingleimage" id="importImageButton3">Edit Image</button>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">3.</span>
+                                </div>
+                                <input type="text" class="form-control figure-caption" id="fig3Caption"
+                                    placeholder="Insert Caption">
+                            </div>
+                        </figure>
+                        <figure class="figure1">
+                            <div class="img-container">
+                                <img src="../assets/img/noimage.jpg" id="fig4" class="figure-img  rounded"
+                                    alt="A generic square placeholder image with rounded corners in a figure.">
+                            </div>
+
+                            <input type="file" id="imageInput4" style="display: none;">
+                            <button class="importsingleimage" id="importImageButton4">Edit Image</button>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">4.</span>
+                                </div>
+                                <input type="text" class="form-control figure-caption" id="fig4Caption"
+                                    placeholder="Insert Caption">
+                            </div>
+                        </figure>
+                    </div>
+                    <div class="col-md-4 " id='figure-group3'>
+                        <figure class="figure1">
+                            <div class="img-container">
+                                <img src="../assets/img/noimage.jpg" id="fig5" class="figure-img  rounded"
+                                    alt="A generic square placeholder image with rounded corners in a figure.">
+                            </div>
+
+                            <input type="file" id="imageInput5" style="display: none;">
+                            <button class="importsingleimage" id="importImageButton5">Edit Image</button>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">5.</span>
+                                </div>
+                                <input type="text" class="form-control figure-caption" id="fig5Caption"
+                                    placeholder="Insert Caption">
+                            </div>
+                        </figure>
+                        <figure class="figure1">
+                            <div class="img-container">
+                                <img src="../assets/img/noimage.jpg" id="fig6" class="figure-img  rounded"
+                                    alt="A generic square placeholder image with rounded corners in a figure.">
+                            </div>
+
+                            <input type="file" id="imageInput6" style="display: none;">
+                            <button class="importsingleimage" id="importImageButton6">Edit Image</button>
+
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">6.</span>
+                                </div>
+                                <input type="text" class="form-control figure-caption" id="fig6Caption"
+                                    placeholder="Insert Caption">
+                            </div>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-sm-4 col-lg-5">
+            <div class="row">
+                <div class="other-options">
+                    <h5>
+                        <span class="underline-3">Othe</span>r options
+                    </h5>
+                    <form class="needs-validation" novalidate>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" checked='true' id="customRadio"
+                                name="radio" value="Endo">
+                            <label class="custom-control-label" for="customRadio">Endoscopy</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="customRadio2" name="radio"
+                                value="Colo">
+                            <label class="custom-control-label" for="customRadio2">Colonoscopy</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline" style="display:none">
+                            <input type="radio" class="custom-control-input" id="customRadio3" name="radio" value="Ent">
+                            <label class="custom-control-label" for="customRadio3">Ent</label>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Doctor's Advice</span>
+                                </div>
+                                <textarea id='doctors-advice' class="form-control doctors-advice" maxlength="100"
+                                    rows="3" col="3" aria-label="With textarea"></textarea>
+                                <div class="invalid-tooltip-10">
+                                    Please be kind to add some advice.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Button trigger modal -->
+                        <div class="camera-button">
+                            <div class="col-b">
+                                <select id="select">
+                                    <option>Choose Camera</option>
+                                </select>
+                            </div>
+                            <div class="cameraAdjustment">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="cameraRadio1"
+                                        name="camradio" value="CameraLarge">
+                                    <label class="custom-control-label" for="cameraRadio1">Full</label>
+                                </div>
+
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" checked='true' id="cameraRadio2" 
+                                    name="camradio" value="CameraSmall">
+                                    <label class="custom-control-label" for="cameraRadio2">Mini</label>
+                                </div>
+                            </div>
+
+                            <div class="col-a">
+                                <button type="button" id="camera_button" class="btn btn-primary" data-toggle="modal"
+                                    data-target="#exampleModal">
+                                    Take Photos !
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" id="camera-dialog" role="document">
+                                <div class="modal-content" id="camera-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Camera</h5>
+                                        <button type="button" id="stop-camera" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true" class="times">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body" id="camerabody">
+                                        <span>
+                                            <button type="button" id="capture" class="btn"><img
+                                                    src="../assets/img/camera.png" alt="Take Photo"
+                                                    aria-label="Take Photo"></button>
+                                        </span>
+                                        <div id="camera-view">
+                                            <video autoplay id="video"></video>
+                                        </div>
+                                        <canvas id="canvas" style="display: none"></canvas>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div class="output">
+                                            <img id="photo" src="" alt="The screen capture will appear in this box.">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Upload Patient Images</span>
+                                </div>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" accept=".jpg,.png,.jpeg"
+                                        id="inputGroupFile01" min="6" max="6" multiple>
+                                    <label class="custom-file-label" for="inputGroupFile01">Select files</label>
+                                </div>
+                                <div class="invalid-tooltip-11">
+                                    Please be kind to add some advice.
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row ">
+                <div class="btns other-options">
+                    <button class="proceed" id="proceed">PROCEED</button>
+                    <button class="reset" id="reset">Refresh</button>
+                </div>
+            </div>
+        </div>
+        <!-- date script -->
+        <script src="../assets/vendor/bootstrap/js/bootstrap.js"></script>
+        <script type="text/javascript">
+            $(function () {
+                $('#sandbox-container .input-group.date').datepicker({
+                    maxViewMode: 3,
+                    todayBtn: true,
+                    autoclose: true,
+                    todayHighlight: true,
+                    orientation: "bottom auto"
+                });
+            });
+        </script>
+        <script src="../renderer-process/handlefiles.js"></script>
+        <script src="../assets/js/camera.js"></script>
+        <script src="../assets/js/imageimport.js"></script>
+</body>
+
+</html>

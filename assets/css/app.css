@@ -1,0 +1,802 @@
+/*
+ * CSS Styles for Application
+ *
+ */
+
+/* Resets */
+body,p,h1,h2,h3,h4,h5,h6,div,span,header,footer,img,a,a:hover,a:active,a:visited,table,tr,td,th,form,input,button,select,textarea{
+  line-height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  text-decoration: none;
+  color: #1a1a1a;
+  border-width: 0;
+}
+
+.clear{
+  float: none;
+  width: 100%;
+  height: 1px;
+}
+
+/* Main color palette */
+.header{
+  background-color: #fff;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  border-color: #fff;
+  box-shadow: 0 -25px 11px 20px #000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 0;
+  min-width: 1200px;
+}
+
+.header ul{
+  list-style-type: none;
+  text-align: right;
+  padding: 0 75px;
+  float: right;
+}
+
+.header ul li{
+  display: inline-block;
+  padding: 10px 10px 0 10px;
+}
+
+.header ul li a{
+  text-transform: uppercase;
+  font-weight: 900 !important;
+  font-size: 11px;
+}
+
+.header ul li.loggedIn{
+  display: none;
+}
+
+body.loggedIn .header ul li.loggedIn{
+  display: inline-block;
+}
+
+body.loggedIn .header ul li.loggedOut{
+  display: none;
+}
+
+.header .logo{
+  text-align: left;
+  padding: 0 0 0 90px;
+  float: left;
+}
+
+/* .header .logo img{
+    width: 50px;
+} */
+
+.content {
+  margin-top: 150px;
+  width: 1000px;
+  margin: 150px auto;
+}
+
+.footer{
+  width: 100%;
+  background-color: #1a1a1a;
+  padding: 50px 0;
+  text-align: center;
+  border-width: 1px 0 0 0;
+  border-color: #fff;
+  border-style: solid;
+}
+
+.footer .copyright{
+  color: #fff;
+  font-size: 10px;
+}
+
+/* Index */
+h1{
+  text-align: center;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 0 0 5px 0;
+}
+
+h2{
+  text-align: center;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 0 0 20px 0;
+}
+body.index-1{
+  background: url('../img/Screenshot_1.png') repeat ;
+ 
+}
+.index .blurb{
+  text-align: center;
+  background-color: #ececec;
+  border-color: #b3b3b3;
+  border-style: dotted;
+  border-width: 1px;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0 auto 20px auto;
+  max-width: 500px;
+  line-height: 150%;
+  font-size: 14px;
+}
+
+.ctaWrapper{
+  text-align: center;
+}
+.login-two .login-two-logo img{
+  margin-left: 1rem !important;
+  width:5rem;
+  height: 5rem;
+}
+.login-two{
+  margin:0.5rem 2rem;
+}
+.cta,a.cta:hover,a.cta:active,a.cta:visited,button.cta:hover,button.cta:active,button.cta:visited{
+  background-color: #1a1a1a;
+  color: #fff;
+  border-radius: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+  padding: 15px;
+  width: 100px;
+  cursor: pointer;
+}
+.login,a.login:hover,a.login:active,a.login:visited,button.login:hover,button.login:active,button.login:visited{
+  border:rgb(72, 101, 228) solid 2px;
+  /* border-radius: 10px; */
+  text-transform: capitalize;
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+  padding: 15px;
+  width: 100px;
+  cursor: pointer;
+}
+
+.start-name .h2{
+  display: block;
+  text-align: left !important;
+}
+.login-note{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-top: 2rem;
+  text-align: left !important;
+  width: 90%;
+  font-size: 16px;
+}
+.login-section{
+  margin-top:2rem;
+}
+.copyright{
+  position: absolute;
+  bottom:3rem;
+  right:37%;
+  font-size: 11px;
+}
+#index-page{
+  text-align: center;
+}
+.blue{
+background: rgba(189, 181, 173, 0);
+border: rgb(78, 74, 74) solid 2px;
+border-radius: 5px;
+color: rgb(78, 74, 74);
+}
+.index-template{
+  margin-top:5rem;
+}
+.form-wrapper{
+  margin:1rem auto !important;
+  padding:2.5rem;
+  max-width: 400px;
+  box-shadow: #3d3c3c 0px 0px 5px 1px;
+  border-radius: 0.3rem;
+}
+
+.cta.green{
+  background-color: #217844 !important;
+}
+
+.cta.red{
+  background-color: #c83737 !important;
+}
+
+.warning{
+  font-style: italic;
+  color: #c83737;
+  font-size: 17px;
+  text-align: center;
+  line-height: 150%;
+  padding: 0 0 20px 0 ;
+}
+
+/* Form Styling for Account Creation page and others */
+
+
+#formError{
+  display: none;
+  background-color: #c83737;
+  font-style: italic;
+  color: rgb(107, 11, 11);
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin: 0 0 15px 0;
+  text-align: center;
+  border-color: #d87070;
+  border-width: 2px;
+  border-style: solid;
+}
+#formErro{
+  display: none;
+  background-color: #c83737;
+  font-style: italic;
+  color: rgb(107, 11, 11);
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin: 0 0 15px 0;
+  text-align: center;
+  border-color: #d87070;
+  border-width: 2px;
+  border-style: solid;
+}
+.formSuccess{
+  display: none;
+  background-color: #217844;
+  font-style: italic;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin: 0 0 15px 0;
+  text-align: center;
+  border-color: #35c06d;
+  border-width: 2px;
+  border-style: solid;
+}
+
+hr {
+  margin: 30px 0;
+}
+
+input,select,option {
+  border-width: 1px;
+  border-radius: 2px;
+  padding: 7px 1%;
+  width: 100%;
+}
+
+.checkboxGroup input{
+  display: inline-block;
+  width: initial;
+  margin: 20px;
+}
+
+input.disabled{
+  background-color: #efefef;
+}
+
+.inputWrapper{
+  padding: 0 0 20px 0;
+}
+
+.inputLabel{
+  padding: 0 0 0px 0;
+  color: #363636;
+}
+#sessionCreate div:nth-child(2) div:nth-child(2) input{
+  width:15rem;
+  margin-left:2.8rem;
+  height: 2.3rem;
+  padding:5px;
+  margin-bottom: 0.5rem;
+}
+#login-template section span.h2{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size:20px;
+  color:#434343;
+  margin-left: 20% !important;
+  padding-bottom:1rem !important;
+}
+#login-template section span.h1{
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size:35px;
+  color:#363636;
+  margin-left:10% !important;
+  font-weight: normal;
+  margin-bottom:3rem;
+  padding-top:1rem !important;
+}
+#sessionCreate div:nth-child(3) div:nth-child(2) input{
+  width:15rem;
+  margin-left:3rem;
+  height: 2.3rem;
+  padding:5px;
+  margin-bottom: 0.5rem;
+}
+#sessionCreate div:nth-child(2) div.inputLabel{
+  margin-top: 10px;
+  font-size:13px;
+}
+#sessionCreate div:nth-child(3) div.inputLabel{
+  margin-top: 10px;
+  font-size:13px;
+}
+.backButton{
+  text-transform: uppercase;
+  font-weight: bold !important;
+  display: inline-block !important;
+  width: 100px;
+  padding: 7px !important;
+  color: #fff !important;
+  background-color: #1a1a1a;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+table{
+  width: 100% !important;
+}
+
+tr{
+  width: 100% !important;
+}
+
+th{
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 10px;
+  border-color: #000;
+  border-style: dotted;
+  padding: 10px;
+  margin: 0 0 10px 0;
+  background-color: #efefef;
+}
+
+td{
+  padding: 5px;
+}
+
+td a, td a:hover, td a:active{
+  color: #2e5fa8;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* form errors */
+.invalid-tooltip-1,.invalid-tooltip-2,.invalid-tooltip-3,.invalid-tooltip-4,.invalid-tooltip-5,.invalid-tooltip-6,.invalid-tooltip-7,.invalid-tooltip-8,.invalid-tooltip-9,.invalid-tooltip-10{
+  background: #df4b4b;
+  position: absolute;
+  display:none;
+  top:-0.5rem;
+  right: 0;
+  font:12px;
+  color:white;
+  padding:5px;
+}
+.invalid-tooltip-11{
+  background: #df4b4b;
+  position: absolute;
+  display:none;
+  top:2.5rem;
+  right: 0;
+  font:12px;
+  color:white;
+  padding:5px;
+}
+.figure img{
+  margin-top: -0.8rem;
+  margin-left:-26%;
+  margin-bottom: -2rem;
+  width:10rem;
+  height:10rem;
+  
+}
+
+.image-container{
+  width:20rem;
+  height: 15rem;
+  overflow: hidden;
+  justify-items: center;
+}
+
+.figure1 img{
+  margin-top: -1rem;
+  margin-left:-2rem;
+  margin-bottom: -2.5rem;
+  width:13rem;
+  height:12rem;
+  
+}
+.img-container{
+  width:13.2rem;
+  height: 11.3rem;
+  overflow: hidden;
+  justify-items: center;
+}
+.figure figcaption input{
+ text-align: center;
+font-size:12px;
+width:10rem !important;
+margin-top:1rem !important;
+}
+
+.underline{
+  font-size:1.3rem;
+  border-bottom:solid 4px rgba(121, 12, 12, 0.822);
+}
+.underline-2{
+  font-size:1.3rem;
+  border-bottom:solid 4px rgba(167, 99, 21, 0.822);
+}
+.underline-3{
+  font-size:1.3rem;
+  border-bottom:solid 4px rgba(145, 158, 23, 0.822);
+}
+.images-container,.medical-information{
+  box-shadow: #3d3c3c 0px 0px 5px 1px;
+  border-radius: 0.3rem;
+}
+.medical-information{
+  margin-bottom:1.5rem;
+  background: #f5f2f2;
+}
+.col-md-12.medical-information{
+  padding:2rem;
+}
+.medical-information .input-group{
+  margin-bottom: 0.5rem;
+}
+/* .images-container{
+  padding: 1.5rem;
+  background: #f1eeee;
+}
+.col-md-7.images-container{
+  max-width: 56.333333% !important; 
+  margin-right: 1.4rem; 
+  padding:2rem;
+  padding-left: 3rem;
+} */
+.row.downrow{
+  margin-left:0.1rem;
+  margin-right:0.1rem;
+}
+body.index-2{
+   padding:1rem 5rem 1rem 5rem;
+   background: #fffcfc;
+}
+.other-options .input-group{
+  margin-bottom: 1rem;
+}
+.other-options .custom-control label{
+  margin-top:5px;
+  font-size: 1rem;
+
+}
+.other-options{
+  padding:1rem;
+  width: 100%;
+  background: #f5f2f2;
+  box-shadow: #3d3c3c 0px 0px 5px 1px;
+  border-radius: 0.3rem;
+}
+.btns{
+  display: block;
+}
+.btns.other-options{
+  margin-top:1rem;
+}
+.btns buttons{
+  display: block;
+}
+#close{
+  color:rgb(107, 6, 6);
+  text-decoration: none;
+  font-weight: 600;
+  position: absolute;
+  bottom:5px;
+  right: 49%;
+}
+#close:hover{
+  color:rgb(49, 3, 3);
+  font-weight: 700;
+}
+.btns .proceed{
+  margin-top:1rem;
+  margin-left:17%;
+  font-size: 3rem;
+  font-weight: 600;
+  color:rgb(248, 212, 212);
+  border-radius: 0.5rem;
+  background:rgba(189, 181, 173, 0.966);
+  padding:30px;
+  cursor:pointer;
+}
+.btns .proceed:hover{
+  color:rgb(248, 212, 212);
+  border-radius: 0.5rem;
+  background:rgba(233, 121, 36, 0.966);
+}
+.btns .reset{
+  margin-top:1rem;
+  margin-left:40%;
+  font-size: 1rem;
+  font-weight: 400;
+  color:rgb(248, 212, 212);
+  background:rgba(73, 68, 62, 0.966);
+  padding:10px;
+  cursor:pointer;
+}
+.btns .reset:hover{
+  background:rgba(22, 22, 22, 0.966);
+  color:rgb(247, 234, 234);
+}
+.fa-calendar-alt{
+  font-size:3rem;
+}
+
+.calender{
+  width: 30px;
+  height: 37px;
+}
+html body.index-2 div.col-md-12.col-lg-12.col-sm-12.medical-information div.row div.col-md-4 form div#sandbox-container.input-group div.input-group.date div.input-group span.input-group-addon{
+  position: absolute;
+  right: 0;
+}
+.report .row .logo img{
+  height:11rem;
+  width:100%;
+  padding-bottom:2px;
+}
+.report {
+  padding:2rem 0rem 2rem 0rem;
+}
+html body.report div.row div.col-md-6 h4{
+  font-weight: 600;
+  font-size:22px;
+}
+html body.report div.row div.col-md-6 p{
+  font-size: 19px;
+}
+html body.report div.row div.col-md-4.print p{
+  font-weight: 600;
+  margin-top: 4rem;
+  font-size:16px;
+}
+html body.report div.row div.col-md-12 div.row p{
+  font-weight: 600;
+  font-size: 13px;
+}
+html body.report div.row div.col-md-12 h4{
+  font-weight: 600;
+  color:rgb(146, 42, 42);
+  border-bottom: 2px solid rgb(92, 82, 82);
+  text-align: center;
+}
+html body.report div.row div.col-md-12 div.row div.col-md-12.col-lg-12.col-sm-12 div.report-images div.row div.col-md-4 figure.figure img.figure-img.rounded{
+  height: 17rem;
+  width:26rem;
+}
+html body.report div.row div.col-md-12 div.row div.col-md-12.col-lg-12.col-sm-12 div.report-images div.row div.col-md-4 figure.figure figcaption.figure-caption{
+  height: 2rem;
+  word-break: normal;
+  padding:5px;
+  width:20rem;
+  margin-top: 1rem;
+  border: #eeeded groove 1px;
+}
+html body.report div.row div.col-md-12 div.row div.col-md-12.col-lg-12.col-sm-12 div.report-images div.row div.col-md-6 figure.figure img.figure-img.rounded{
+  height: 20rem;
+  width:25rem;
+}
+body > div:nth-child(2) > div:nth-child(1) > div:nth-child(2){
+  border-bottom:2px solid rgb(128, 124, 124);
+  margin-bottom:0.5rem;
+}
+div.col-md-6:nth-child(1){
+  padding-left:6rem;
+}
+html body.report div.row div.col-md-12 div.row div.col-md-12.col-lg-12.col-sm-12 div.report-images div.row div.col-md-6 figure.figure figcaption.figure-caption{
+  height: 2rem;
+  word-break: normal;
+  padding:5px;
+  width:20rem;
+  font-size:16px;
+  border: #dddddd groove 1px;
+}
+html body.report div.row div.col-md-12 div.row table tbody tr td{
+  border-bottom:1px solid gray;
+  border-top:1px solid gray;
+}
+html body.report div.row div.col-md-12 div.row table tbody tr td:nth-child(2){
+  border-left:1px solid gray;
+}
+html body.report div.row div.col-md-12 div.row table tbody tr td{
+  /* line-height: 20px; */
+  padding:10px;
+  margin-left:5px;
+  font-size:18px;
+  font-weight: 600;
+  color:rgb(6, 99, 6);
+  text-align: left;
+}
+
+html body.report div.row div.col-md-12 div.row table tbody tr.repo-endo-findings td{
+  /* line-height: 7rem !important; */
+  vertical-align: top;
+  height: 10rem;
+}
+html body.report div.row div.col-md-12 div.row table tbody tr td{
+  /* line-height: 7rem !important; */
+  vertical-align: top !important;
+}
+html body.report div.row div.col-md-12 div.row table tbody tr.repo-endo-diag td{
+  /* line-height: 70px !important; */
+  height: 2rem;
+}
+html body.report div.row div.col-md-12 div.row table tbody tr.repo-doctor-advise td{
+  line-height: 10px !important;
+  height:4rem;
+
+}
+html body.report div.row div.col-md-12 div.row.doctor-physician-container p{
+  line-height: 20px;
+  font-size:16px;
+  font-weight: 600;
+  color:rgb(6, 99, 6);
+}
+html body.report div.row div.col-md-12 div.row.doctor-physician-container div.col-md-12 p span.doctor-physician{
+  font-size:20px;
+  font-weight: 500;
+}
+/* adding font size to the user input */
+html body.report div.row div.col-md-12 div.row table tbody tr.repo-doctor-advise td.repo-doctors-advise span#repo-doctors-advise,html body.report div.row div.col-md-12 div.row table tbody tr.repo-endo-findings td.repo-endoscopic-findings span#repo-endoscopic-findings,html body.report div.row div.col-md-12 div.row table tbody tr td.repo-Pre-Op span#repo-Pre-Op,html body.report div.row div.col-md-12 div.row table tbody tr td.repo-Biopsy-site span#repo-Biopsy-site,html body.report div.row div.col-md-12 div.row table tbody tr td.repo-endoscopic-diagnosis span#repo-endoscopic-diagnosis{
+  white-space: pre-wrap;
+  font-size:19px;
+}
+html body.report div.row div.col-md-12 div.row div.col-md-8 p span#repo-name.repo-name,span#repo-sex.repo-sex,span#repo-age.repo-age,html body.report div.row div.col-md-12 div.row div.col-md-4 p span#repo-patientNo.repo-patientNo,html body.report div.row div.col-md-12 div.row div.col-md-4 p span#repo-date.repo-date{
+  font-size:19px;
+}
+/* #adding fontsize to the user input */
+html body.report div.row div.col-md-12 div.row.doctor-physician-container {
+ margin-top:2rem;
+}
+html body.report div.row div.col-md-12 div.row.doctor-physician-container div.col-md-12 div.row p{
+padding-left:12.1rem;
+}
+html body.report div.row div.col-md-12 div.row.doctor-physician-container div.col-md-12 p:first-child{
+  text-align:center;
+}
+#index-page{
+margin-left:20%;
+margin-right:20%;
+}
+.login-header{
+  display: flex;
+  text-align: center;
+}
+
+.login-header .start-name .h1,.login-header .start-name .h2{
+  font-size: 35px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-transform: capitalize !important;
+  color:#363636;
+  font-weight: normal;
+}
+.login-header .start-name{
+  margin-left: 1rem;
+  margin-top: 1rem;
+}
+.login-header .start-name .underline{
+  font-size:35px;
+  border-bottom:solid 4px #FF9933;
+  color:#363636;
+}
+.login-header .start-logo img{
+  width:8rem;
+  height: 8rem;
+}
+/* making it a lil bit responsive */
+@media screen and (max-width:1600px){
+  body.index-2{
+    padding:1rem 2rem 1rem 2rem !important;
+    background: #fffcfc;
+ }
+ .col-md-7.images-container{
+  max-width: 56.333333% !important; 
+  margin-right: 1.3rem !important; 
+  padding:1rem;
+  padding-left: 3rem;
+}
+}
+/* Camera CSS */
+.modal-body{
+  height:20rem;
+  padding:0 !important;
+  width:100%;
+  background-color: #1a1a1a;
+}
+.modal-body span{
+  position:absolute;
+  right:0.5rem; 
+  top:45%;
+  z-index:50;
+}
+.modal-body span img{
+  height:50px;
+  width:50px;
+  cursor:pointer;
+  z-index:100;
+  opacity:0.8;
+}
+.times{
+  font-size: 15px;
+  font-weight: bolder;
+}
+.modal-footer button img{
+  height:50px;
+  width:50px;
+  cursor: pointer;
+}
+#button{
+  margin-bottom:1rem;
+  height:3.5rem;
+  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.output img{
+  height:5rem;
+  width:5rem;
+}
+#camera-view #video{
+  width:32rem;
+  height:20rem;
+}
+#camera-view{
+  padding:0;
+}
+.camera-button{
+  display:flex;
+  width:100%;
+}
+.col-a{
+  padding-left: 1rem;
+}
+.col-b{
+  width:50%;
+  height: 3rem;
+  padding-left:1rem;
+  padding-top:0rem;
+}
+
+.cameraAdjustment{
+  display: flex;
+  margin-left:1.5em;
+  margin-top:0.2em;
+  margin-bottom: 1em;
+}
+/* end of camera css */
+
+
+/* single image imports */
+.importsingleimage {
+  /* padding: 10px 20px; */
+  background-color: white;
+  padding-bottom: 5px;
+  color: #1b3c5f;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}

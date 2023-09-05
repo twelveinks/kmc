@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <!-- <script src="../../node_modules/jquery/dist/jquery.min.js"></script> -->
+    <script type="text/javascript">
+        const ipc = require('electron').ipcRenderer;
+        const BrowserWindow = require('electron').remote.BrowserWindow;
+
+        ipc.on('insert-data', function (event, data, fromWindowId) {
+            const fromWindow = BrowserWindow.fromId(fromWindowId);
+            // fromWindow.webContents.send('inserted-data',number,result);
+            do {
+                var cart;
+                var result;
+                if (cart !== 'done') {
+                    cart = addImage(data);
+                    //console.log(cart);
+                }
+                if (!result) {
+                    result = datafunction(data);
+                    //console.log(result);
+                }
+            } while (cart !== 'done' || !result);
+            ipc.send('open-information-dialog');
+            ipc.on('information-dialog-selection', (event, index) => {
+
+                if (index === 0) {
+                    // ipc.send('EndoReported',result);
+                    fromWindow.webContents.send('EndoReport', result);
+                } else fromWindow.webContents.send('Abort');
+            });
+            ipc.send('getUserNames');
+        });
+        ipc.on('username', (event, arg) => {
+            var usernames = document.getElementById('doctor-physician');
+            usernames.innerHTML = arg;
+        });
+        function addImage(data) {
+            var fig1 = document.getElementById('fig1');
+            var fig2 = document.getElementById('fig2');
+            var fig3 = document.getElementById('fig3');
+            var fig4 = document.getElementById('fig4');
+            var fig5 = document.getElementById('fig5');
+            var fig6 = document.getElementById('fig6');
+            ///figure src
+            fig1.setAttribute('src', data.repo_figure1);
+            fig2.setAttribute('src', data.repo_figure2);
+            fig3.setAttribute('src', data.repo_figure3);
+            fig4.setAttribute('src', data.repo_figure4);
+            fig5.setAttribute('src', data.repo_figure5);
+            fig6.setAttribute('src', data.repo_figure6);
+            return 'done';
+        }
+        function datafunction(data) {
+            var repo_name = document.getElementById('repo-name');
+            var repo_sex = document.getElementById('repo-sex');
+            var repo_age = document.getElementById('repo-age');
+            var repo_patientNo = document.getElementById('repo-patientNo');
+            var repo_date = document.getElementById('repo-date');
+            var repo_preOp = document.getElementById('repo-Pre-Op');
+            var repo_scopic_findings = document.getElementById('repo-endoscopic-findings');
+            var repo_scopic_diagnosis = document.getElementById('repo-endoscopic-diagnosis');
+            var repo_biopay = document.getElementById('repo-Biopsy-site');
+            var repo_doctors_advice = document.getElementById('repo-doctors-advise');
+            var fig1Caption = document.getElementById('fig1Caption');
+            var fig2Caption = document.getElementById('fig2Caption');
+            var fig3Caption = document.getElementById('fig3Caption');
+            var fig4Caption = document.getElementById('fig4Caption');
+            var fig5Caption = document.getElementById('fig5Caption');
+            var fig6Caption = document.getElementById('fig6Caption');
+
+            // var add=addImages();
+            //personal information
+            repo_patientNo.innerHTML = data.repo_patientNo;
+            repo_age.innerHTML = data.repo_age;
+            repo_date.innerHTML = data.repo_date;
+            repo_name.innerHTML = data.repo_name;
+            repo_sex.innerHTML = data.repo_sex;
+            repo_biopay.innerHTML = data.repo_biopay;
+
+            repo_preOp.innerHTML = data.repo_preOp;
+            repo_scopic_findings.innerHTML = data.repo_scopic_findings;
+            repo_scopic_diagnosis.innerHTML = data.repo_scopic_diagnosis;
+            repo_doctors_advice.innerHTML = data.repo_doctors_advice;
+
+            ///caption
+            fig1Caption.innerHTML = data.repo_caption1;
+            fig2Caption.innerHTML = data.repo_caption2;
+            fig3Caption.innerHTML = data.repo_caption3;
+            fig4Caption.innerHTML = data.repo_caption4;
+            fig5Caption.innerHTML = data.repo_caption5;
+            fig6Caption.innerHTML = data.repo_caption6;
+
+            var comb = data.repo_patientNo + ' ' + data.repo_name + ' ' + data.repo_date;
+
+            return (comb);
+        }
+    </script>
+</head>
+
+<body class="report">
+    <div class="row">
+        <div class="col-md-12 logo">
+            <img src="../assets/img/header11.png">
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col-md-12">
+            <h4>COLONOSCOPY REPORT</h4>
+            <div class="row">
+                <div class="col-md-8">
+                    <p style="font-size:17px">
+                        Name:<span class="repo-name" id="repo-name" style="padding-left:0.5rem"></span>
+                    </p>
+                    <p style="font-size:17px">
+                        Sex:<span class="repo-sex" id="repo-sex" style="padding-left:0.5rem"></span>
+                    </p>
+                    <p style="font-size:17px">
+                        Age:<span class="repo-age" id="repo-age" style="padding-left:0.5rem"></span>
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <p style="font-size:17px">
+                        Patient No:<span class="repo-patientNo" id="repo-patientNo" style="padding-left:0.5rem"></span>
+                    </p>
+                    <p style="font-size:17px">
+                        Proc. Date:<span class="repo-date" id="repo-date" style="padding-left:0.5rem"></span>
+                    </p>
+                </div>
+
+            </div>
+            <div class="row">
+                <!-- divs to handle browse images -->
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                    <div class="report-images">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <figure class="figure">
+                                    <div class="image-container">
+                                        <img src="../assets/img/noimage.jpg" id="fig1" class="figure-img  rounded"
+                                            alt="A generic square placeholder image with rounded corners in a figure.">
+                                    </div>
+                                    <div class="input-group" style="margin-top: 1em;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">1.</span>
+                                        </div>
+                                        <div class="form-control figure-caption"><span id='fig1Caption'
+                                                style="font-size:17px"></span></div>
+                                    </div>
+                                </figure>
+                                <figure class="figure">
+                                    <div class="image-container">
+                                        <img src="../assets/img/noimage.jpg" id="fig2" class="figure-img  rounded"
+                                            alt="A generic square placeholder image with rounded corners in a figure.">
+                                    </div>
+                                    <div class="input-group" style="margin-top: 1em;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">2.</span>
+                                        </div>
+                                        <div class="form-control figure-caption"><span id='fig2Caption'
+                                                style="font-size:17px"></span></div>
+                                    </div>
+                                </figure>
+                            </div>
+
+                            <div class="col-md-4">
+                                <figure class="figure">
+                                    <div class="image-container">
+                                        <img src="../assets/img/noimage.jpg" id="fig3" class="figure-img  rounded"
+                                            alt="A generic square placeholder image with rounded corners in a figure.">
+                                    </div>
+                                    <div class="input-group" style="margin-top: 1em;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">3.</span>
+                                        </div>
+                                        <div class="form-control figure-caption"><span id='fig3Caption'
+                                                style="font-size:17px"></span></div>
+                                    </div>
+                                </figure>
+                                <figure class="figure">
+                                    <div class="image-container">
+                                        <img src="../assets/img/noimage.jpg" id="fig4" class="figure-img  rounded"
+                                            alt="A generic square placeholder image with rounded corners in a figure.">
+                                    </div>
+                                    <div class="input-group" style="margin-top: 1em;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">4.</span>
+                                        </div>
+                                        <div class="form-control figure-caption"><span id='fig4Caption'
+                                                style="font-size:17px"></span></div>
+                                    </div>
+                                </figure>
+                            </div>
+                            <div class="col-md-4">
+                                <figure class="figure">
+                                    <div class="image-container">
+                                        <img src="../assets/img/noimage.jpg" id="fig5" class="figure-img  rounded"
+                                            alt="A generic square placeholder image with rounded corners in a figure.">
+                                    </div>
+                                    <div class="input-group" style="margin-top: 1em;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">5.</span>
+                                        </div>
+                                        <div class="form-control figure-caption"><span id='fig5Caption'
+                                                style="font-size:17px"></span></div>
+                                    </div>
+                                </figure>
+                                <figure class="figure">
+                                    <div class="image-container">
+                                        <img src="../assets/img/noimage.jpg" id="fig6" class="figure-img  rounded"
+                                            alt="A generic square placeholder image with rounded corners in a figure.">
+                                    </div>
+                                    <div class="input-group" style="margin-top: 1em;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">6.</span>
+                                        </div>
+                                        <div class="form-control figure-caption"><span id='fig6Caption'
+                                                style="font-size:17px"></span></div>
+                                    </div>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-left:2px">
+                <div class="col-md-8 col-lg-8">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td width="25%">
+                                    Indication:
+                                </td>
+                                <td class="repo-Pre-Op" width="75%">
+                                    <span id="repo-Pre-Op">
+
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="repo-endo-findings">
+                                <td>
+                                    Endoscopic Findings:
+                                </td>
+                                <td class="repo-endoscopic-findings">
+                                    <span id="repo-endoscopic-findings">
+
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="repo-endo-diag">
+                                <td>
+                                    Endoscopic Diagnosis:
+                                </td>
+                                <td class="repo-endoscopic-diagnosis">
+                                    <span id="repo-endoscopic-diagnosis">
+
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Procedure done/ Biopsy Site :
+                                </td>
+                                <td class="repo-Biopsy-site">
+                                    <span id="repo-Biopsy-site">
+
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="repo-doctor-advise">
+                                <td>
+                                    Doctor's Advise :
+                                </td>
+                                <td class="repo-doctors-advise">
+                                    <span id="repo-doctors-advise">
+
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <img src="../assets/img/digestive.png" style="width: 60%; padding-left: 2em;">
+                </div>
+
+            </div>
+            <div class="row doctor-physician-container">
+                <div class="col-md-12">
+                    <p>Examining Doctor/Physician: <span class="doctor-physician" id="doctor-physician"></span></p>
+                    <div class="row">
+                        <p>This Report is for Clinical Reference!!</p>
+                        <p>Signature: _________________</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="position: absolute; left: 65%; margin-top: 3em;">
+        <p>&copy Developed by Twelve Inks Company Ltd (www.twelveinks.com)</p>
+    </div>
+</body>
+
+</html>
