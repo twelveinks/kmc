@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>All Reports - Medical Reports Dashboard</title>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+    <div class="content">
+        <div class="header">
+            <div class="logo">
+                <img src="../assets/img/logo1.png" alt="Med-Scope Logo">
+                <h1>All Reports</h1>
+            </div>
+            <ul>
+                <li><a href="dashboard.html"><i class="fa fa-th-large"></i> DASHBOARD</a></li>
+                <li><a href="users.html"><i class="fa fa-users"></i> USERS</a></li>
+                <li><a href="#" onclick="window.close()"><i class="fa fa-times"></i> CLOSE</a></li>
+            </ul>
+        </div>
+
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fa fa-file-text-o"></i> All Reports</h2>
+                        <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">
+                            <i class="fa fa-arrow-left"></i> Back to Dashboard
+                        </button>
+                    </div>
+                    <div id="allReports" class="reports-list">
+                        <!-- Reports will be loaded here -->
+                        <div class="text-center">
+                            <i class="fa fa-spinner fa-spin fa-2x"></i>
+                            <p>Loading reports...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Function to open PDF
+        function openPDF(filePath) {
+            ipcRenderer.send('openPDF', filePath);
+        }
+
+        // Load all reports
+        function loadAllReports() {
+            ipcRenderer.send('getAllReports');
+        }
+
+        // Handle reports data
+        ipcRenderer.on('allReportsData', (event, reports) => {
+            const reportsContainer = document.getElementById('allReports');
+            
+            if (!reports || reports.length === 0) {
+                reportsContainer.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="fa fa-info-circle fa-2x mb-3 d-block"></i>
+                        <h4>No Reports Found</h4>
+                        <p>No reports have been generated yet. Create your first report from the dashboard.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const reportsList = reports.map((report, index) => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-1 text-center text-muted">
+                                <h5 class="mb-0">#${reports.length - index}</h5>
+                            </div>
+                            <div class="col-md-4">
+                                <h5 class="card-title mb-1">${report.patientName}</h5>
+                                <p class="card-text text-muted mb-0">
+                                    <small><i class="fa fa-user-md"></i> ${report.doctorName}</small>
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="card-text text-muted mb-0">
+                                    <i class="fa fa-calendar"></i> ${formatDate(report.date)}
+                                </p>
+                                <p class="card-text text-muted mb-0">
+                                    <small><i class="fa fa-tag"></i> ${report.type}</small>
+                                </p>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button class="btn btn-primary" onclick="openPDF('${report.filePath}')">
+                                    <i class="fa fa-file-pdf-o"></i> Open Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            reportsContainer.innerHTML = reportsList;
+        });
+
+        // Load reports when page loads
+        document.addEventListener('DOMContentLoaded', loadAllReports);
+    </script>
+</body>
+</html>

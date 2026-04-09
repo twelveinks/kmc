@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Reports Dashboard</title>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+    <div class="content">
+    <div class="header">
+        <div class="logo">
+            <img src="../assets/img/logo1.png" alt="Med-Scope Logo">
+            <h1>Medical Reports Dashboard</h1>
+        </div>
+        <ul>
+            <li><a href="dashboard.html" class="active"><i class="fa fa-th-large"></i> DASHBOARD</a></li>
+            <li><a href="users.html"><i class="fa fa-users"></i> USERS</a></li>
+            <!-- <li><a href="settings.html"><i class="fa fa-cog"></i> SETTINGS</a></li> -->
+            <li><a href="#" onclick="window.close()"><i class="fa fa-times"></i> CLOSE</a></li>
+        </ul>
+    </div>
+    
+    <div class="dashboard-container">
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h2>Welcome back, <span class="doctor-name" id="doctorName"></span></h2>
+                <p class="date-display"><i class="fa fa-calendar"></i> Today is <span id="currentDate"></span></p>
+            </div>
+        </div>
+
+        <div class="action-cards">
+            <div class="action-card primary" onclick="openReportCreation()">
+                <i class="fa fa-file-text"></i>
+                <span>Create New Report</span>
+            </div>
+            <div class="action-card secondary" onclick="openReferralForm()">
+                <i class="fa fa-paper-plane"></i>
+                <span>Write Referral</span>
+            </div>
+            <div class="action-card warning" onclick="openOperationForm()">
+                <i class="fa fa-hospital-o"></i>
+                <span>Operation Form</span>
+            </div>
+        </div>
+
+        <div class="reports-overview">
+            <div class="view-reports-btn" onclick="viewReports()">
+                <i class="fa fa-history"></i>
+                <span>View Past Reports</span>
+            </div>
+        </div>
+
+        <div class="recent-reports-section">
+            <div class="section-header">
+                <h2><i class="fa fa-clipboard"></i> Recent Reports</h2>
+                <button class="btn-view-all" onclick="viewReports()">
+                    View All <i class="fa fa-chevron-right"></i>
+                </button>
+            </div>
+            <div id="recentReports" class="recent-reports-list">
+                <!-- Reports will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Listen for user data from main process
+        ipcRenderer.on('user-data', (event, userData) => {
+            console.log('Received user data from main process:', userData);
+            const nameElement = document.getElementById('doctorName');
+            if (nameElement && userData) {
+                // Extract firstName from userData
+                let firstName = '';
+                if (userData.firstName) {
+                    firstName = userData.firstName;
+                } else if (typeof userData === 'string') {
+                    // If we got a string, extract first name (assuming format is "LastName FirstName")
+                    const parts = userData.split(' ');
+                    firstName = parts.length > 1 ? parts[1] : parts[0];
+                }
+                
+                const displayName = `Dr. ${firstName}`;
+                nameElement.textContent = displayName;
+                console.log('Set doctor name to:', displayName);
+            }
+        });
+
+        // Fallback: Request user data if not received
+        setTimeout(() => {
+            const nameElement = document.getElementById('doctorName');
+            if (!nameElement.textContent) {
+                console.log('No user data received, requesting...');
+                ipcRenderer.send('getUserNames');
+                ipcRenderer.once('username', (event, userData) => {
+                    if (nameElement && userData) {
+                        let firstName = '';
+                        if (typeof userData === 'object' && userData.firstName) {
+                            firstName = userData.firstName;
+                        } else if (typeof userData === 'string') {
+                            // If we got a string, extract first name (assuming format is "LastName FirstName")
+                            const parts = userData.split(' ');
+                            firstName = parts.length > 1 ? parts[1] : parts[0];
+                        }
+                        
+                        const displayName = `Dr. ${firstName}`;
+                        nameElement.textContent = displayName;
+                        console.log('Set doctor name from getUserNames:', displayName);
+                    }
+                });
+            }
+        }, 1000);
+
+        // Global error handler to prevent page from going blank
+        window.addEventListener('error', function(event) {
+            console.error('Global error caught:', event.error);
+            event.preventDefault(); // Prevent the page from going blank
+            return true;
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            event.preventDefault(); // Prevent the page from going blank
+            return true;
+        });
+
+        function openReportCreation() {
+            window.location.href = 'checksCreate.html';
+        }
+
+        function openReferralForm() {
+            window.location.href = 'referralForm.html';
+        }
+
+        function openOperationForm() {
+            window.location.href = 'operationForm.html';
+        }
+
+        // function openSettings() {
+        //     ipcRenderer.send('openSettings');
+        // }
+
+        // Function to format report date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Update current date in the format "Tuesday 23rd October 2025"
+        function updateCurrentDate() {
+            const date = new Date();
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const dayName = dayNames[date.getDay()];
+            const day = date.getDate();
+            const monthName = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            
+            // Add ordinal suffix to day (1st, 2nd, 3rd, 4th, etc)
+            function getOrdinalSuffix(day) {
+                if (day > 3 && day < 21) return 'th';
+                switch (day % 10) {
+                    case 1: return 'st';
+                    case 2: return 'nd';
+                    case 3: return 'rd';
+                    default: return 'th';
+                }
+            }
+
+            const formattedDate = `${dayName} ${day}${getOrdinalSuffix(day)} ${monthName} ${year}`;
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.textContent = formattedDate;
+                console.log('Date set to:', formattedDate);
+            }
+        }
+
+        // Load recent reports
+        async function loadRecentReports() {
+            try {
+                const reportsContainer = document.getElementById('recentReports');
+                reportsContainer.innerHTML = '<div class="card"><div class="card-body text-center"><i class="fa fa-spinner fa-spin"></i> Loading reports...</div></div>';
+                
+                // Request recent reports from main process
+                ipcRenderer.send('getRecentReports');
+            } catch (error) {
+                console.error('Error loading recent reports:', error);
+                const reportsContainer = document.getElementById('recentReports');
+                reportsContainer.innerHTML = `
+                    <div class="card">
+                        <div class="card-body text-center text-danger">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            <p>Error loading reports. Please try again later.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Handle recent reports response
+        ipcRenderer.on('recentReportsData', (event, reports) => {
+            const reportsContainer = document.getElementById('recentReports');
+            if (!reports || reports.length === 0) {
+                reportsContainer.innerHTML = `
+                    <div class="card">
+                        <div class="card-body text-center text-muted">
+                            <i class="fa fa-file-text-o"></i>
+                            <p>No reports found. Create your first report!</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const reportsList = reports.map(report => `
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title mb-1">${report.patientName}</h5>
+                                <p class="card-text text-muted mb-2">
+                                    <small>
+                                        <i class="fa fa-calendar"></i> ${formatDate(report.date)}
+                                        <br>
+                                        <i class="fa fa-user-md"></i> ${report.doctorName}
+                                    </small>
+                                </p>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" onclick="openPDF('${report.filePath}')">
+                                    <i class="fa fa-file-pdf-o"></i> Open
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            reportsContainer.innerHTML = reportsList;
+        });
+
+        // Open PDF function
+        function openPDF(filePath) {
+            ipcRenderer.send('openPDF', filePath);
+        }
+
+        // Update date and get username when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Dashboard DOMContentLoaded Event ===');
+            console.log('Current date object:', new Date());
+            
+            // Check if elements exist
+            const dateElement = document.getElementById('currentDate');
+            const nameElement = document.getElementById('doctorName');
+            
+            // Load recent reports
+            loadRecentReports();
+            console.log('Date element found:', !!dateElement);
+            console.log('Name element found:', !!nameElement);
+            
+            // Update the date immediately
+            console.log('Calling updateCurrentDate()...');
+            updateCurrentDate();
+            
+            // Try to get username from global variable first (set during login)
+            console.log('Checking global.currentUser...');
+            if (global.currentUser) {
+                console.log('=== Found currentUser in global ===');
+                console.log('User data:', global.currentUser);
+                const firstName = global.currentUser.firstName;
+                if (nameElement && firstName) {
+                    const displayName = `Dr. ${firstName}`;
+                    nameElement.textContent = displayName;
+                    console.log('Name element updated to:', displayName);
+                } else {
+                    console.log('ERROR: Name element or firstName missing');
+                }
+            } else {
+                console.log('No currentUser in global, trying IPC...');
+                // Fallback: Get username through IPC
+                console.log('Sending getUserNames IPC message...');
+                ipcRenderer.send('getUserNames');
+                
+                ipcRenderer.once('username', (event, username) => {
+                    console.log('=== Received username from IPC ===');
+                    console.log('Username value:', username);
+                    console.log('Username type:', typeof username);
+                    
+                    if (nameElement && username) {
+                        // The username is already "LastName FirstName" format from login
+                        // Extract first name (it's the second part)
+                        const nameParts = username.trim().split(' ');
+                        console.log('Name parts:', nameParts);
+                        const firstName = nameParts.length > 1 ? nameParts[0] : nameParts[1];
+                        const displayName = `Dr. ${firstName}`;
+                        nameElement.textContent = displayName;
+                        console.log('Name element updated to:', displayName);
+                    } else {
+                        console.log('ERROR: Name element or username is missing');
+                        console.log('Name element:', nameElement);
+                        console.log('Username:', username);
+                    }
+                });
+            }
+
+            // Set a timeout to check if username was set
+            setTimeout(() => {
+                if (!nameElement.textContent || nameElement.textContent === '') {
+                    console.error('WARNING: Username was not set after 3 seconds');
+                }
+            }, 3000);
+        });
+        
+        function viewReports() {
+            window.location.href = 'all-reports.html';
+        }
+    </script>
+</body>
+</html>

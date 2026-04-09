@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Report Generation</title>
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/vendor/font-awesome/css/font-awesome.min.css">
+    <style>
+        .report-container {
+            padding: 20px;
+        }
+        .image-preview {
+            max-width: 200px;
+            margin: 10px;
+        }
+        #imageContainer {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="../assets/img/logo1.png" alt="Med-Scope Logo">
+            <h1>Medical Report Generation</h1>
+        </div>
+        <ul>
+            <li><a href="dashboard.html"><i class="fa fa-arrow-left"></i> BACK TO DASHBOARD</a></li>
+            <li><a href="#" onclick="window.close()"><i class="fa fa-times"></i> CLOSE</a></li>
+        </ul>
+    </div>
+    
+    <div class="report-container">
+        <form id="reportForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Patient Information</h4>
+                    <div class="form-group">
+                        <label>First Name:</label>
+                        <input type="text" class="form-control" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name:</label>
+                        <input type="text" class="form-control" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth:</label>
+                        <input type="date" class="form-control" id="dateOfBirth">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender:</label>
+                        <select class="form-control" id="gender">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h4>Images</h4>
+                    <input type="file" id="imageInput" multiple accept="image/*" class="form-control">
+                    <div id="imageContainer"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <h4>Medical Findings</h4>
+                <textarea class="form-control" id="findings" rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <h4>Recommendations</h4>
+                <textarea class="form-control" id="recommendations" rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Generate PDF Report</button>
+                <button type="button" class="btn btn-secondary" id="saveAsDraft">Save as Draft</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        require('../renderer-process/report-generation.js');
+    </script>
+</body>
+</html>

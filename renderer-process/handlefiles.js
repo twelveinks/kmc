@@ -3,10 +3,45 @@ const { ipcRenderer } = require('electron');
 //get all elements from the main window required for verification
 const submit = document.getElementById('proceed');
 const reset = document.getElementById('reset');
+const backBtn = document.getElementById('backToDashboard');
+
+// Listen for form data restoration
+ipcRenderer.on('restore-form-data', (event, formData) => {
+    if (formData) {
+        // Restore all form fields
+        patient_no.value = formData.patient_no;
+        firstName.value = formData.firstName;
+        lastName.value = formData.lastName;
+        gender.value = formData.gender;
+        age.value = formData.age;
+        date.value = formData.date;
+        preOp.value = formData.preOp;
+        scopicFindings.value = formData.scopicFindings;
+        scopicDiagnosis.value = formData.scopicDiagnosis;
+        biopay.value = formData.biopay;
+        doctorsAdvice.value = formData.doctorsAdvice;
+        caption1.value = formData.caption1;
+        caption2.value = formData.caption2;
+        caption3.value = formData.caption3;
+        caption4.value = formData.caption4;
+        caption5.value = formData.caption5;
+        caption6.value = formData.caption6;
+        
+        // Restore images if they were saved
+        if (formData.collector) {
+            collector = formData.collector;
+        }
+    }
+});
+
 submit.addEventListener('click', validate);
 reset.addEventListener('click', function (e) {
     // window.reload(BrowserWindow.getFocusedWindow());
     ipcRenderer.send('reload');
+});
+
+backBtn.addEventListener('click', function (e) {
+    window.location.href = 'dashboard.html';
 });
 //medical information
 const patient_no = document.getElementById('patient_no');
@@ -254,12 +289,8 @@ function validate() {
             });
         }
     }
-    if (fileInput.files.length < 1) {
-        document.querySelector('.invalid-tooltip-11').innerHTML = 'Please insert all images, press ctrl on your keyboard and select all images before u proceed !';
-        document.querySelector('.invalid-tooltip-11').style.display = "block";
-    }
     if (radio1.checked || radio2.checked) {
-        if (patient_no.value && firstName.value && lastName.value && age.value && date.value && scopicFindings.value && preOp.value /*&& scopicDiagnosis.value*/ && biopay.value && fileInput.files.length >= 1 && fileInput.files.length >= 6 && doctorsAdvice.value) {
+        if (patient_no.value && firstName.value && lastName.value && age.value && date.value && scopicFindings.value && preOp.value && scopicDiagnosis.value && biopay.value && doctorsAdvice.value) {
             if (radio1.checked) {
                 createPDF('endo');
             } else if (radio2.checked) {
@@ -267,29 +298,61 @@ function validate() {
             }
         }
     } else if (radio3.checked) {
-        if (patient_no.value && firstName.value && lastName.value && age.value && date.value && scopicFindings.value && preOp.value && doctorsAdvice.value && fileInput.files.length >= 1 && fileInput.files.length >= 4) {
+        if (patient_no.value && firstName.value && lastName.value && age.value && date.value && scopicFindings.value && preOp.value && doctorsAdvice.value) {
             createPDF('Ent');
         }
     }
 }
 
 function createPDF(reportType) {
-    //caption setting
-    if (!(caption1.value || caption2.value || caption3.value || caption4.value || caption5.value || caption6.value)) {
-        if (!caption1.value) {
-            caption1.value = " ";
-        } if (!caption2.value) {
-            caption2.value = " ";
-        } if (!caption3.value) {
-            caption3.value = " ";
-        } if (!caption4.value) {
-            caption4.value = " ";
-        } if (!caption5.value) {
-            caption5.value = " ";
-        } if (!caption6.value) {
-            caption6.value = " ";
-        }
-    }
+    // Get form data
+    const formData = {
+        patient_no: patient_no.value,
+        firstName: firstName.value,
+        lastName: lastName.value,
+        gender: gender.value,
+        age: age.value,
+        date: date.value,
+        preOp: preOp.value,
+        scopicFindings: scopicFindings.value,
+        scopicDiagnosis: scopicDiagnosis.value,
+        biopay: biopay.value,
+        doctorsAdvice: doctorsAdvice.value,
+        caption1: caption1.value || " ",
+        caption2: caption2.value || " ",
+        caption3: caption3.value || " ",
+        caption4: caption4.value || " ",
+        caption5: caption5.value || " ",
+        caption6: caption6.value || " ",
+        reportType: reportType,
+        collector: collector // Save image data
+    };
+    
+    // Store form data for preview
+    ipcRenderer.send('preview-form', formData);
+    
+    // Store form data before sending to preview
+    window.currentFormData = {
+        patient_no: patient_no.value,
+        firstName: firstName.value,
+        lastName: lastName.value,
+        gender: gender.value,
+        age: age.value,
+        date: date.value,
+        preOp: preOp.value,
+        scopicFindings: scopicFindings.value,
+        scopicDiagnosis: scopicDiagnosis.value,
+        biopay: biopay.value,
+        doctorsAdvice: doctorsAdvice.value,
+        caption1: caption1.value,
+        caption2: caption2.value,
+        caption3: caption3.value,
+        caption4: caption4.value,
+        caption5: caption5.value,
+        caption6: caption6.value,
+        reportType: reportType
+    };
+    
     const dataHandler = require('../renderer-process/report');
     //var date=date.value;
     // console.log(collector);

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Scope Report</title>
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .main-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            padding: 20px;
+            background: white;
+            margin: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .page-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-out;
+        }
+        
+        .page-container.slide-out {
+            transform: translateX(-100%);
+        }
+        
+        .page-container.slide-in {
+            transform: translateX(0);
+        }
+        
+        .nav-link {
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: #34495e;
+        }
+        
+        .nav-link.active {
+            background: #3498db;
+        }
+
+        .user-info {
+            padding: 15px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 20px;
+        }
+
+        /* Slide animations */
+        .slide-transition {
+            transition: transform 0.3s ease-out;
+        }
+
+        .slide-enter {
+            transform: translateX(100%);
+        }
+
+        .slide-enter-active {
+            transform: translateX(0);
+        }
+
+        .slide-exit {
+            transform: translateX(-100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="user-info">
+                <h5 id="userName">Welcome</h5>
+                <small id="userRole">Doctor</small>
+            </div>
+            <nav>
+                <div class="nav-link" onclick="showPage('dashboard')">Dashboard</div>
+                <div class="nav-link" onclick="showPage('reports')">Reports</div>
+                <div class="nav-link" onclick="showPage('patients')">Patients</div>
+                <div class="nav-link" onclick="showPage('users')" id="adminOnly">Users Management</div>
+                <div class="nav-link" onclick="showPage('settings')">Settings</div>
+                <div class="nav-link" onclick="logout()">Logout</div>
+            </nav>
+        </div>
+        
+        <div class="content-area">
+            <div id="mainContent" class="page-container slide-in">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        // Load page content
+        async function showPage(page) {
+            const mainContent = document.getElementById('mainContent');
+            
+            // Add slide-out animation
+            mainContent.classList.remove('slide-in');
+            mainContent.classList.add('slide-out');
+            
+            // Wait for animation
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            // Load new content
+            switch(page) {
+                case 'dashboard':
+                    mainContent.innerHTML = await loadContent('../sections/dashboard.html');
+                    break;
+                case 'reports':
+                    mainContent.innerHTML = await loadContent('../sections/reports-list.html');
+                    break;
+                case 'patients':
+                    mainContent.innerHTML = await loadContent('../sections/patients.html');
+                    break;
+                case 'users':
+                    mainContent.innerHTML = await loadContent('../sections/users.html');
+                    break;
+                case 'settings':
+                    mainContent.innerHTML = await loadContent('../sections/settings.html');
+                    break;
+            }
+            
+            // Add slide-in animation
+            mainContent.classList.remove('slide-out');
+            mainContent.classList.add('slide-in');
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.textContent.toLowerCase() === page) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // Load content from HTML file
+        async function loadContent(path) {
+            try {
+                const response = await fetch(path);
+                return await response.text();
+            } catch (error) {
+                console.error('Error loading content:', error);
+                return '<div class="p-4">Error loading content</div>';
+            }
+        }
+        
+        // Handle logout
+        function logout() {
+            ipcRenderer.send('logout');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('dashboard');
+            
+            // Set user info
+            if (global.currentUser) {
+                document.getElementById('userName').textContent = 
+                    `${global.currentUser.firstName} ${global.currentUser.lastName}`;
+                
+                // Show/hide admin features
+                const adminOnly = document.getElementById('adminOnly');
+                if (global.currentUser.role !== 'admin') {
+                    adminOnly.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

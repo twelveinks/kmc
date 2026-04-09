@@ -1,0 +1,502 @@
+const path = require('path');
+const glob = require('glob');
+const fs = require('fs');
+const {app, BrowserWindow, ipcMain, dialog} = require('electron');
+
+// Initialize debug mode check
+const debug = /--debug/.test(process.argv[2]);
+
+// Enable hot reload in debug mode
+if (debug) {
+  require('electron-reload')(__dirname, {
+    electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
+    hardResetMethod: 'exit',
+    ignored: [
+      /node_modules|[/\\]\./,
+      /data\.json$/,
+      /database\.sqlite$/
+    ]
+  });
+}
+
+if (process.mas) app.setName('Report Maker');
+app.setName('Report Preview');
+let mainWindow = null
+
+function initialize () {
+  makeSingleInstance()
+
+  loadDemos()
+
+  // Create application menu
+  const { Menu } = require('electron');
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        { role: 'quit' }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        { type: 'separator' },
+        { role: 'front' }
+      ]
+    }
+  ];
+  
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
+  function createWindow () {
+    var iconpath=path.join(__dirname,'/assets/img/65x65.png');
+    const windowOptions = {
+      width: 1200,
+      minWidth: 1100,
+      height: 800,
+      minHeight: 700,
+      icon: iconpath,
+      title: app.getName(),
+      frame: true,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+        enableRemoteModule: true
+      }
+    }
+
+    // Add menu items for window control
+    const { Menu } = require('electron');
+    const template = [
+      {
+        label: 'File',
+        submenu: [
+          { role: 'quit' }
+        ]
+      },
+      {
+        label: 'View',
+        submenu: [
+          { role: 'reload' },
+          { role: 'forceReload' },
+          { role: 'toggleDevTools' },
+          { type: 'separator' },
+          { role: 'resetZoom' },
+          { role: 'zoomIn' },
+          { role: 'zoomOut' },
+          { type: 'separator' },
+          { role: 'togglefullscreen' }
+        ]
+      },
+      {
+        label: 'Window',
+        submenu: [
+          { role: 'minimize' },
+          { role: 'zoom' },
+          { type: 'separator' },
+          { role: 'front' },
+          { type: 'separator' },
+          { role: 'window' }
+        ]
+      }
+    ];
+    
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+ 
+    if (process.platform === 'linux') {
+      windowOptions.icon = path.join(__dirname, '/assets/app-icon/png/512.png');
+    }
+    
+    mainWindow = new BrowserWindow(windowOptions)
+    
+    // Add keyboard shortcuts for window management after window creation
+    const localShortcut = require('electron-localshortcut');
+    
+    localShortcut.register(mainWindow, 'F11', () => {
+      const isFullScreen = mainWindow.isFullScreen();
+      mainWindow.setFullScreen(!isFullScreen);
+    });
+
+    localShortcut.register(mainWindow, 'Esc', () => {
+      if (mainWindow.isFullScreen()) {
+        mainWindow.setFullScreen(false);
+      }
+    });
+    mainWindow.loadURL(path.join('file://', __dirname, 'index.html'));
+
+    // Always open DevTools in development
+    mainWindow.webContents.openDevTools()
+    if (debug) {
+      mainWindow.maximize()
+      require('devtron').install()
+    }
+
+    mainWindow.on('closed', () => {
+      mainWindow = null
+    })
+  }
+
+  app.on('ready', () => {
+    createWindow()
+  })
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  })
+
+  app.on('activate', () => {
+    if (mainWindow === null) {
+      createWindow()
+    }
+  })
+}
+
+// Make this app a single instance app.
+//
+// The main window will be restored and focused instead of a second window
+// opened when a person attempts to launch a second instance.
+//
+// Returns true if the current version of the app should quit instead of
+// launching.
+function makeSingleInstance () {
+  if (process.mas) return
+
+  app.requestSingleInstanceLock()
+
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
+}
+
+// Require each JS file in the main-process dir
+function loadDemos () {
+  const files = glob.sync(path.join(__dirname, 'main-process/**/*.js'))
+  files.forEach((file) => { require(file) })
+}
+
+// Handle opening report windows
+let reportWindows = {};
+
+ipcMain.on('open-report-window', (event, { type, data, htmlFile }) => {
+  const reportWindow = new BrowserWindow({
+    width: 1200,
+    height: 700,
+    modal: true,
+    show: true,
+    parent: mainWindow,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+  
+  reportWindow.setMenu(null);
+  reportWindow.loadURL(path.join('file://', __dirname, 'sections', htmlFile));
+  
+  // Store reference
+  reportWindows[reportWindow.id] = reportWindow;
+  
+  reportWindow.webContents.on('did-finish-load', () => {
+    reportWindow.webContents.send('insert-data', data);
+  });
+  
+  reportWindow.on('closed', () => {
+    delete reportWindows[reportWindow.id];
+  });
+});
+
+// Handle EndoReport event from report window
+ipcMain.on('EndoReport', async (event, result) => {
+  const webContents = event.sender;
+  const reportWindow = BrowserWindow.fromWebContents(webContents);
+  
+  if (reportWindow) {
+    try {
+      const homedir = require('os').homedir();
+      const fs = require('fs');
+      const path = require('path');
+      const dist = path.join(homedir, '/scope report/', result + '.pdf');
+      
+      // Ensure directory exists
+      const dir = path.dirname(dist);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      
+      // Hide confirmation buttons before generating PDF
+      await webContents.executeJavaScript(`
+        document.getElementById('confirmationButtons').style.display = 'none';
+      `);
+      
+      // Wait a bit for the DOM to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Generate PDF
+      const data = await webContents.printToPDF({
+        marginsType: 0,
+        printBackground: true,
+        printSelectionOnly: false,
+        landscape: false,
+        pageSize: 'A4'
+      });
+      
+      // Show buttons again
+      await webContents.executeJavaScript(`
+        document.getElementById('confirmationButtons').style.display = 'block';
+      `);
+      
+      // Check if file exists
+      if (fs.existsSync(dist)) {
+        const response = dialog.showMessageBoxSync(reportWindow, {
+          type: 'warning',
+          buttons: ['Overwrite', 'Cancel'],
+          defaultId: 1,
+          title: 'File Exists',
+          message: 'This file already exists. Do you want to overwrite it?'
+        });
+        
+        if (response === 1) { // Cancel
+          return;
+        }
+      }
+      
+      // Write PDF file
+      fs.writeFileSync(dist, data);
+      
+      // Show success message
+      dialog.showMessageBoxSync(reportWindow, {
+        type: 'info',
+        title: 'Success',
+        message: 'Report saved successfully!',
+        buttons: ['OK']
+      });
+      
+      // Open the PDF
+      const pdfWindow = new BrowserWindow({
+        width: 1200,
+        height: 700,
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true
+        }
+      });
+      pdfWindow.setMenu(null);
+      pdfWindow.loadFile(dist);
+      
+      // Close report preview and reload main window
+      reportWindow.close();
+      if (mainWindow) {
+        mainWindow.reload();
+      }
+      
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      dialog.showErrorBox('Error', 'Failed to generate PDF: ' + error.message);
+    }
+  }
+});
+
+// Handle Abort event from report window
+ipcMain.on('Abort', (event) => {
+  // Close the report window that sent this
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  if (win) {
+    win.close();
+  }
+});
+
+// Handle reload request
+ipcMain.on('reload', (event) => {
+  if (mainWindow) {
+    mainWindow.reload();
+  }
+});
+
+// Save Referral as PDF
+ipcMain.on('saveReferralAsPDF', async (event, patientInfo) => {
+  const { dialog } = require('electron');
+  const win = BrowserWindow.fromWebContents(event.sender);
+  
+  // Create filename from patient info
+  let defaultFileName = 'Referral_Letter';
+  if (patientInfo && (patientInfo.id || patientInfo.firstName)) {
+    const parts = [];
+    if (patientInfo.id) parts.push(patientInfo.id);
+    if (patientInfo.firstName) parts.push(patientInfo.firstName);
+    if (patientInfo.lastName) parts.push(patientInfo.lastName);
+    if (parts.length > 0) {
+      defaultFileName = parts.join('_').replace(/[^a-zA-Z0-9_-]/g, '');
+    }
+  }
+  
+  const { filePath } = await dialog.showSaveDialog(win, {
+    title: 'Save Referral Letter',
+    defaultPath: `${defaultFileName}.pdf`,
+    filters: [{ name: 'PDF', extensions: ['pdf'] }]
+  });
+  
+  if (filePath) {
+    // Wait for renderer to mark empty fields
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Log for debugging
+    const hasEmptyFields = await event.sender.executeJavaScript(`
+      document.querySelectorAll('.empty-field').length
+    `);
+    console.log('Empty fields found:', hasEmptyFields);
+    
+    event.sender.printToPDF({
+      printBackground: true,
+      marginsType: 0,
+      pageSize: 'A4',
+      landscape: false,
+      preferCSSPageSize: true,
+      scaleFactor: 100
+    }).then(pdfData => {
+      require('fs').writeFile(filePath, pdfData, (error) => {
+        if (error) throw error;
+        
+        // Remove empty-field classes
+        event.sender.executeJavaScript(`
+          document.querySelectorAll('.empty-field').forEach(el => el.classList.remove('empty-field'));
+        `);
+        
+        // Open the PDF file in a new window and bring to front
+        const pdfWindow = new BrowserWindow({
+          width: 1200,
+          height: 800,
+          webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true
+          }
+        });
+        pdfWindow.loadFile(filePath);
+        pdfWindow.focus();
+        pdfWindow.moveTop();
+        
+        dialog.showMessageBox(win, {
+          type: 'info',
+          title: 'Success',
+          message: 'PDF saved successfully!'
+        });
+      });
+    }).catch(error => {
+      console.log(error);
+    });
+  }
+});
+
+// Save Operation Report as PDF
+ipcMain.on('saveOperationAsPDF', async (event, patientInfo) => {
+  const { dialog } = require('electron');
+  const win = BrowserWindow.fromWebContents(event.sender);
+  
+  // Debug: Log received patient info
+  console.log('Received patient info:', patientInfo);
+  
+  // Create filename from patient info
+  let defaultFileName = 'Operation_Report';
+  if (patientInfo && (patientInfo.id || patientInfo.firstName)) {
+    const parts = [];
+    if (patientInfo.id) parts.push(patientInfo.id);
+    if (patientInfo.firstName) parts.push(patientInfo.firstName);
+    if (patientInfo.lastName) parts.push(patientInfo.lastName);
+    if (parts.length > 0) {
+      defaultFileName = parts.join('_').replace(/[^a-zA-Z0-9_-]/g, '');
+    }
+  }
+  
+  console.log('Generated filename:', defaultFileName);
+  
+  const { filePath } = await dialog.showSaveDialog(win, {
+    title: 'Save Operation Report',
+    defaultPath: `${defaultFileName}.pdf`,
+    filters: [{ name: 'PDF', extensions: ['pdf'] }]
+  });
+  
+  if (filePath) {
+    // Wait for renderer to mark empty fields
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Log for debugging
+    const hasEmptyFields = await event.sender.executeJavaScript(`
+      document.querySelectorAll('.empty-field').length
+    `);
+    console.log('Empty fields found:', hasEmptyFields);
+    
+    event.sender.printToPDF({
+      printBackground: true,
+      marginsType: 0,
+      pageSize: 'A4',
+      landscape: false,
+      preferCSSPageSize: true,
+      scaleFactor: 100
+    }).then(pdfData => {
+      require('fs').writeFile(filePath, pdfData, (error) => {
+        if (error) throw error;
+        
+        // Remove empty-field classes
+        event.sender.executeJavaScript(`
+          document.querySelectorAll('.empty-field').forEach(el => el.classList.remove('empty-field'));
+        `);
+        
+        // Open the PDF file in a new window and bring to front
+        const pdfWindow = new BrowserWindow({
+          width: 1200,
+          height: 800,
+          webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true
+          }
+        });
+        pdfWindow.loadFile(filePath);
+        pdfWindow.focus();
+        pdfWindow.moveTop();
+        
+        dialog.showMessageBox(win, {
+          type: 'info',
+          title: 'Success',
+          message: 'PDF saved successfully!'
+        });
+      });
+    }).catch(error => {
+      console.log(error);
+    });
+  }
+});
+
+initialize()

@@ -1,4 +1,3 @@
-
 //Bulk Import of Images
 const fileInput = document.getElementById('inputGroupFile01');
 
@@ -8,50 +7,52 @@ let collector = [];
 let thumbnails = document.getElementsByClassName('img-container');
 //adding a listener to the file upload button.
 fileInput.addEventListener('change', function (event) {
-    //console.log(readURL(event));
-    // store the uploaded files to an array
-    //console.log(fileInput.files);
     fileList = [];
     for (var i = 0; i < fileInput.files.length; i++) {
         if (fileInput.files[i].type == 'image/bmp' | fileInput.files[i].type == 'image/png' | fileInput.files[i].type == 'image/jpeg') {
-            // console.log(fileInput.files[i]);
-            // var gcompress={};
-            // gcompress= new ImageCompressor(fileInput.files[i],{convertSize:500000});
             fileList.push(fileInput.files[i]);
-            //fileList.push(gcompress);
             document.querySelector('.invalid-tooltip-11').style.display = "none";
-            if ((radio1.checked || radio2.checked) && fileInput.files.length < 6) {
-                document.querySelector('.invalid-tooltip-11').innerHTML = 'Please Ensure to select all 6 images at once';
-                document.querySelector('.invalid-tooltip-11').style.display = "block";
-            } else if (fileInput.files.length > 6) {
-                document.querySelector('.invalid-tooltip-11').innerHTML = 'Images were greater than 6 but only the first 6 are considered';
-                document.querySelector('.invalid-tooltip-11').style.display = "block";
-            }
         }
         else {
-            // alert(fileInput.files[i].type+' '+'This image format is not supported, please use .jpg,.png or.bmp');
             document.querySelector('.invalid-tooltip-11').innerHTML = 'This image format is not supported, please use .jpg,.png or.bmp';
             document.querySelector('.invalid-tooltip-11').style.display = "block";
         }
     }
 
-    // console.log(thumbnails);
     if (fileList < 1) {
-        //   console.log('user has not selected any file'+ fileList.length);
         for (i = 0; i < thumbnails.length; i++) {
             thumbnails[i].firstElementChild.src = '../assets/img/noimage.jpg';
         }
     }
 
     let k = 0;
+    let processedCount = 0;
+    const totalFiles = fileList.length;
+    
+    if (totalFiles === 0) {
+        for (i = 0; i < thumbnails.length; i++) {
+            thumbnails[i].firstElementChild.src = '../assets/img/noimage.jpg';
+        }
+        return;
+    }
+    
+    // Upload without processing/cropping
     fileList.forEach(file => {
-        thumbnails[k].firstElementChild.src = URL.createObjectURL(file);
-        collector.push(URL.createObjectURL(file));
-        k++;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (k < thumbnails.length) {
+                thumbnails[k].firstElementChild.src = e.target.result;
+                collector[k] = e.target.result;
+            }
+            k++;
+            processedCount++;
+            
+            if (processedCount === totalFiles) {
+                console.log('All images uploaded without cropping');
+            }
+        };
+        reader.readAsDataURL(file);
     });
-
-    //thumbnails[1].firstElementChild.currentSrc="file:///C:/Users/kudz/Report/electron/scope-report/assets/img/logo.png" 
-    //console.log(thumbnails[2].firstElementChild.currentSrc);  
 });
 
 
@@ -69,7 +70,6 @@ const imageInput3 = document.getElementById('imageInput3');
 const imageInput4 = document.getElementById('imageInput4');
 const imageInput5 = document.getElementById('imageInput5');
 const imageInput6 = document.getElementById('imageInput6');
-
 
 // First Image Single import
 image1.addEventListener('click', () => {
@@ -111,8 +111,14 @@ function upload_shortcut(imageinput, state) {
             thumbnails[state].firstElementChild.src = '../assets/img/noimage.jpg';
         } else if (imageinput.files[0].type == 'image/bmp' | imageinput.files[0].type == 'image/png' | imageinput.files[0].type == 'image/jpeg') {
             selectedFile = event.target.files[0];
-            thumbnails[state].firstElementChild.src = URL.createObjectURL(selectedFile);
-            collector[state] = URL.createObjectURL(selectedFile);
+            
+            // Upload without processing/cropping
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                thumbnails[state].firstElementChild.src = e.target.result;
+                collector[state] = e.target.result;
+            };
+            reader.readAsDataURL(selectedFile);
         } else {
             document.querySelector('.invalid-tooltip-11').innerHTML = 'This image format is not supported, please use .jpg,.png or.bmp';
             document.querySelector('.invalid-tooltip-11').style.display = "block";

@@ -2,22 +2,142 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="assets/css/app.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.css">
-    <link rel="import" href="sections/index.html">
-    <link rel="import" href="sections/sessionCreate.html">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/login.css">
   </head>
-  <body  class="index-1">
-    <div class="inner-index-1">
-        <div  class="index">
+  <body class="index-1">
+        <div class="index" id="mainContent">
+              <!-- Index page template -->
+          <div class="index-template" id="index-page">
+              <div class="login-header">
+                <div class="start-logo">
+                  <img src="./assets/img/logo1.png" alt="Med-Scope Logo">
+                </div>
+                <div class="start-name">
+                    <span class="h1">Med-<span class="underline">Scope</span></span>
+                    <span class="h2">Report</span>
+                </div>
+              </div>
+              
+              <div class="login-note">
+                Welcome to our Patient Report Maker System<br>
+                Please contact your administrator for login
+                details.
+              </div>
 
+              <div class="login-section">
+                  <button type="button" id="button-login" data-modal="initial-page" class="login">
+                    Login To System
+                  </button>
+              </div>
+
+              <div class="copyright">
+                © 2019 - <span id="copyrightYear" style="color: inherit; size: inherit;">2025</span> All Rights Reserved<br>
+                www.twelveinks.com
+              </div>
+              
+              <a id="close" href="javascript:window.close()">Close Application</a>
+              
+              <script>
+                function updateCopyrightYear() {
+                    const minYear = 2025;
+                    const currentYear = new Date().getFullYear();
+                    const yearElement = document.getElementById('copyrightYear');
+                    
+                    // Use the higher value between minYear and currentYear
+                    yearElement.textContent = Math.max(minYear, currentYear);
+                }
+                
+                // Update year when the page loads
+                document.addEventListener('DOMContentLoaded', updateCopyrightYear);
+              </script>
+          </div>          <!-- Login template -->
+          <div id="login-template" style="display: none;">
+              <div class="login-header">
+                <div class="start-logo">
+                  <img src="./assets/img/logo1.png" alt="Med-Scope Logo">
+                </div>
+                <div class="start-name">
+                    <span class="h1">Med-<span class="underline">Scope</span></span>
+                    <span class="h2">Report</span>
+                </div>
+              </div>
+              
+              <div class="login-note">
+                Please enter your credentials to access the system
+              </div>
+              
+              <div class="login-form">
+                <form id="loginForm">
+                  <div class="form-group">
+                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                  </div>
+                  <div class="form-group">
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                  </div>
+                  <div id="formError" class="alert alert-danger" style="display: none;"></div>
+                  <button type="button" id="login-btn" class="btn btn-primary">Login</button>
+                </form>
+              </div>
+
+              <div class="copyright">
+                © 2019 - <span id="loginCopyrightYear" style="color: inherit;">2025</span> All Rights Reserved<br>
+                www.twelveinks.com
+              </div>
+              
+              <script>
+                // Update copyright year in login template
+                document.getElementById('loginCopyrightYear').textContent = 
+                  document.getElementById('copyrightYear').textContent;
+              </script>
           </div>
-    </div>
+        </div>
     
-      <script>
-        require('./assets/imports')
-        require('./assets/nav')
-        require('./renderer-process/login')
-      </script>
+    <script>
+      // Set up require before anything else
+      window.nodeRequire = require;
+      delete window.require;
+      delete window.exports;
+      delete window.module;
+
+      // Function to initialize everything after DOM is ready
+      function initializeApp() {
+        console.log('Initializing application...');
+        
+        try {
+          // Load jQuery from node_modules
+          window.$ = window.jQuery = window.nodeRequire('jquery');
+          console.log('jQuery loaded successfully');
+          
+          // Load our app scripts in sequence
+          const scripts = [
+            './assets/imports',
+            './assets/nav',
+            './renderer-process/login'
+          ];
+          
+          console.log('Loading application scripts...');
+          scripts.forEach(script => {
+            try {
+              window.nodeRequire(script);
+              console.log(`Loaded ${script} successfully`);
+            } catch (e) {
+              console.error(`Error loading ${script}:`, e);
+            }
+          });
+        } catch (error) {
+          console.error('Error during initialization:', error);
+        }
+      }
+
+      // Initialize app when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApp);
+      } else {
+        initializeApp();
+      }
+    </script>
   </body>
 </html>

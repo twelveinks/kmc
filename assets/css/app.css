@@ -99,7 +99,8 @@ body.loggedIn .header ul li.loggedOut{
 }
 
 /* Index */
-h1{
+/* Default heading styles - dashboard overrides these */
+h1:not(.dashboard-container h1) {
   text-align: center;
   font-size: 20px;
   text-transform: uppercase;
@@ -107,18 +108,30 @@ h1{
   padding: 0 0 5px 0;
 }
 
-h2{
+h2:not(.dashboard-container h2) {
   text-align: center;
   font-size: 13px;
   text-transform: uppercase;
   font-weight: bold;
   padding: 0 0 20px 0;
 }
-body.index-1{
-  background: url('../img/Screenshot_1.png') repeat ;
- 
+body.index-1 {
+  background: #f5f5f5;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.index .blurb{
+
+.index {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.index .blurb {
   text-align: center;
   background-color: #ececec;
   border-color: #b3b3b3;
@@ -398,32 +411,34 @@ td a, td a:hover, td a:active{
   padding:5px;
 }
 .figure img{
-  margin-top: -0.8rem;
-  margin-left:-26%;
-  margin-bottom: -2rem;
-  width:10rem;
-  height:10rem;
-  
+  /* Removed problematic positioning - handled by container */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .image-container{
-  width:20rem;
-  height: 15rem;
+  width: 100%;
+  height: 200px;
   overflow: hidden;
-  justify-items: center;
+  border-radius: 4px;
+  /* background: #f8f9fa; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* border: 1px solid #dee2e6; */
 }
 
 .figure1 img{
-  margin-top: -1rem;
-  margin-left:-2rem;
-  margin-bottom: -2.5rem;
-  width:13rem;
-  height:12rem;
-  
+  /* Removed problematic positioning - handled by container */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .img-container{
   width:13.2rem;
-  height: 11.3rem;
+  height: auto;
+  min-height: 11rem;
   overflow: hidden;
   justify-items: center;
 }
@@ -450,54 +465,318 @@ margin-top:1rem !important;
   box-shadow: #3d3c3c 0px 0px 5px 1px;
   border-radius: 0.3rem;
 }
+/* Medical Information and Forms Styling */
 .medical-information{
-  margin-bottom:1.5rem;
-  background: #f5f2f2;
+  margin-bottom:1rem;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #dee2e6;
+  transition: box-shadow 0.3s ease;
 }
+
+.medical-information:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
 .col-md-12.medical-information{
-  padding:2rem;
+  padding:1.5rem;
 }
+
+.medical-information h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
 .medical-information .input-group{
+  margin-bottom: 0.65rem;
+  transition: all 0.2s ease;
+}
+
+.medical-information .input-group-text {
+  background: #2c3e50;
+  color: white;
+  border: 1px solid #2c3e50;
+  font-weight: 500;
+  min-width: 115px;
+  font-size: 0.85rem;
+  border-radius: 4px 0 0 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.medical-information .form-control {
+  border: 1px solid #ced4da;
+  border-radius: 0 4px 4px 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.medical-information .form-control:focus {
+  border-color: #2c3e50;
+  box-shadow: 0 0 0 0.15rem rgba(44, 62, 80, 0.15);
+  outline: none;
+}
+
+.medical-information textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Browse Images Section */
+.images-container {
+  background: #f8f9fa;
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: none;
+  border: 1px solid #dee2e6;
+  transition: box-shadow 0.3s ease;
+  margin-bottom: 1rem;
+  min-width: 0; /* Allow images container to shrink */
+  flex-shrink: 1;
+}
+
+.images-container:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.browse-images h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.figure1 {
+  background: white;
+  padding: 0.75rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid #dee2e6;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.figure1:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.img-container {
+  width: 100%;
+  height: auto;
+  min-height: 150px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  border: 2px solid #dee2e6;
+  transition: border-color 0.2s ease;
+}
+
+.img-container:hover {
+  border-color: #6c757d;
+}
+
+.figure1 img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0 !important;
+}
+
+.importsingleimage {
+  width: 100%;
+  padding: 0.45rem;
+  background: #1e3a8a;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.importsingleimage:hover {
+  background: #1e40af;
+}
+
+.importsingleimage:hover {
+  background: #343a40;
+}
+
+.figure1 .input-group {
+  margin-bottom: 0;
+}
+
+.figure1 .input-group-text {
+  background: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+  font-weight: 600;
+  border-radius: 4px 0 0 4px;
+}
+
+.figure1 .form-control {
+  border: 1px solid #ced4da;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+}
+
+/* Other Options Section */
+.other-options {
+  padding: 1.25rem;
+  width: 100%;
+  background: #f8f9fa;
+  box-shadow: none;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0; /* Allow shrinking below content size */
+}
+
+.other-options:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.other-options h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  white-space: nowrap; /* Prevent title wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.other-options .input-group {
+  margin-bottom: 0.75rem;
+  min-width: 0; /* Allow input groups to shrink */
+}
+
+.other-options .input-group-text {
+  background: #2c3e50;
+  color: white;
+  border: 1px solid #2c3e50;
+  font-weight: 500;
+  font-size: 0.85rem;
+  border-radius: 4px 0 0 4px;
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap; /* Prevent label wrapping */
+  min-width: 0;
+  flex-shrink: 0; /* Don't shrink labels too much */
+}
+
+.other-options .form-control {
+  border: 1px solid #ced4da;
+  border-radius: 0 4px 4px 0;
+  transition: all 0.2s ease;
+  background: white;
+  padding: 0.5rem 0.75rem;
+  min-width: 0; /* Allow form controls to shrink */
+  flex-shrink: 1;
+  font-size: 0.9rem;
+}
+
+.other-options .form-control:focus {
+  border-color: #2c3e50;
+  box-shadow: 0 0 0 0.15rem rgba(44, 62, 80, 0.15);
+  outline: none;
+}
+
+.other-options .custom-control-label {
+  margin-top: 3px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2c3e50;
+  cursor: pointer;
+}
+
+.other-options .custom-control {
   margin-bottom: 0.5rem;
 }
-/* .images-container{
-  padding: 1.5rem;
-  background: #f1eeee;
+
+.other-options .custom-control-input:checked ~ .custom-control-label::before {
+  background: #2c3e50;
+  border-color: #2c3e50;
 }
-.col-md-7.images-container{
-  max-width: 56.333333% !important; 
-  margin-right: 1.4rem; 
-  padding:2rem;
-  padding-left: 3rem;
-} */
 .row.downrow{
   margin-left:0.1rem;
   margin-right:0.1rem;
+  display: flex !important;
+  flex-wrap: nowrap !important; /* Prevent wrapping */
+  overflow-x: auto; /* Add horizontal scroll if needed */
 }
+
+.row.downrow > [class*='col-'] {
+  margin-bottom: 1.5rem;
+  flex-shrink: 1 !important; /* Allow columns to shrink */
+  min-width: 0 !important; /* Allow shrinking below content size */
+  max-width: none !important; /* Override Bootstrap's max-width */
+  flex-basis: auto !important; /* Override Bootstrap's flex-basis */
+}
+
+/* Specific targeting for the two main columns */
+.row.downrow > .col-md-7 {
+  flex: 7 1 0 !important; /* Take 7 parts of available space */
+  width: auto !important;
+}
+
+.row.downrow > .col-md-5 {
+  flex: 5 1 0 !important; /* Take 5 parts of available space */
+  width: auto !important;
+}
+
 body.index-2{
-   padding:1rem 5rem 1rem 5rem;
+   padding:0.75rem 5rem 0.75rem 5rem;
    background: #fffcfc;
 }
 .other-options .input-group{
   margin-bottom: 1rem;
 }
+.other-options .custom-control {
+  margin-bottom: 0.5rem;
+  flex-shrink: 1;
+  min-width: 0;
+}
 .other-options .custom-control label{
   margin-top:5px;
   font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
 }
 .other-options{
   padding:1rem;
   width: 100%;
   background: #f5f2f2;
-  box-shadow: #3d3c3c 0px 0px 5px 1px;
   border-radius: 0.3rem;
 }
 .btns{
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
 }
 .btns.other-options{
-  margin-top:1rem;
+  margin-top: auto; /* Push buttons to bottom of container */
+  padding-top: 1rem;
 }
 .btns buttons{
   display: block;
@@ -587,8 +866,8 @@ html body.report div.row div.col-md-12 h4{
   text-align: center;
 }
 html body.report div.row div.col-md-12 div.row div.col-md-12.col-lg-12.col-sm-12 div.report-images div.row div.col-md-4 figure.figure img.figure-img.rounded{
-  height: 17rem;
-  width:26rem;
+  height: 20rem;
+  width:25rem;
 }
 html body.report div.row div.col-md-12 div.row div.col-md-12.col-lg-12.col-sm-12 div.report-images div.row div.col-md-4 figure.figure figcaption.figure-caption{
   height: 2rem;
@@ -637,7 +916,7 @@ html body.report div.row div.col-md-12 div.row table tbody tr td{
 html body.report div.row div.col-md-12 div.row table tbody tr.repo-endo-findings td{
   /* line-height: 7rem !important; */
   vertical-align: top;
-  height: 10rem;
+  height: 8rem;
 }
 html body.report div.row div.col-md-12 div.row table tbody tr td{
   /* line-height: 7rem !important; */
@@ -675,10 +954,11 @@ html body.report div.row div.col-md-12 div.row.doctor-physician-container {
  margin-top:2rem;
 }
 html body.report div.row div.col-md-12 div.row.doctor-physician-container div.col-md-12 div.row p{
-padding-left:12.1rem;
+  padding-left:0;
+  text-align: left;
 }
 html body.report div.row div.col-md-12 div.row.doctor-physician-container div.col-md-12 p:first-child{
-  text-align:center;
+  text-align: left;
 }
 #index-page{
 margin-left:20%;
@@ -714,89 +994,624 @@ margin-right:20%;
   body.index-2{
     padding:1rem 2rem 1rem 2rem !important;
     background: #fffcfc;
- }
- .col-md-7.images-container{
-  max-width: 56.333333% !important; 
-  margin-right: 1.3rem !important; 
-  padding:1rem;
-  padding-left: 3rem;
-}
-}
-/* Camera CSS */
-.modal-body{
-  height:20rem;
-  padding:0 !important;
-  width:100%;
-  background-color: #1a1a1a;
-}
-.modal-body span{
-  position:absolute;
-  right:0.5rem; 
-  top:45%;
-  z-index:50;
-}
-.modal-body span img{
-  height:50px;
-  width:50px;
-  cursor:pointer;
-  z-index:100;
-  opacity:0.8;
-}
-.times{
-  font-size: 15px;
-  font-weight: bolder;
-}
-.modal-footer button img{
-  height:50px;
-  width:50px;
-  cursor: pointer;
-}
-#button{
-  margin-bottom:1rem;
-  height:3.5rem;
-  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-.output img{
-  height:5rem;
-  width:5rem;
-}
-#camera-view #video{
-  width:32rem;
-  height:20rem;
-}
-#camera-view{
-  padding:0;
-}
-.camera-button{
-  display:flex;
-  width:100%;
-}
-.col-a{
-  padding-left: 1rem;
-}
-.col-b{
-  width:50%;
-  height: 3rem;
-  padding-left:1rem;
-  padding-top:0rem;
+  }
+  .col-md-7.images-container{
+    margin-right: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .row.downrow {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }
 
-.cameraAdjustment{
+/* Enhanced Responsive Design */
+@media screen and (max-width: 1400px) {
+  body.index-2 {
+    padding: 1rem !important;
+  }
+  
+  .medical-information,
+  .images-container,
+  .other-options {
+    padding: 1.5rem !important;
+  }
+  
+  .btns .proceed {
+    font-size: 1.3rem;
+    padding: 1.2rem 2.5rem;
+  }
+  
+  .row.downrow {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  body.index-2 {
+    padding: 0.75rem !important;
+  }
+  
+  .medical-information h5,
+  .browse-images h5,
+  .other-options h5 {
+    font-size: 1.3rem;
+  }
+  
+  .img-container {
+    height: 200px;
+  }
+  
+  #camera-view {
+    height: 400px;
+  }
+  
+  .col-md-7.images-container {
+    margin-right: 1.5rem !important;
+  }
+  
+  .row.downrow {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .row.downrow {
+    flex-direction: column;
+  }
+  
+  .col-md-7.images-container,
+  .col-md-5 {
+    max-width: 100% !important;
+    margin: 0 0 1.5rem 0 !important;
+    width: 100%;
+  }
+  
+  .images-container,
+  .other-options {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .camera-button {
+    flex-direction: column;
+  }
+  
+  .col-a,
+  .col-b {
+    width: 100%;
+  }
+  
+  .btns .proceed {
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+  }
+  
+  .btns .reset {
+    margin-left: 0.5rem;
+    padding: 0.6rem 1.5rem;
+  }
+  
+  .modal-dialog {
+    max-width: 95%;
+  }
+  
+  #camera-view {
+    height: 350px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body.index-2 {
+    padding: 0.5rem !important;
+  }
+  
+  .medical-information,
+  .images-container,
+  .other-options {
+    padding: 1rem !important;
+  }
+  
+  .medical-information .input-group-text {
+    min-width: 100px;
+    font-size: 0.8rem;
+  }
+  
+  .medical-information .form-control {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .figure1 {
+    padding: 0.75rem;
+  }
+  
+  .img-container {
+    height: 150px;
+  }
+  
+  .btns .proceed {
+    width: 100%;
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+  
+  .btns .reset {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+  
+  .modal-title {
+    font-size: 1.2rem;
+  }
+  
+  #camera-view {
+    height: 300px;
+  }
+  
+  #capture {
+    width: 60px;
+    height: 60px;
+  }
+  
+  #capture img {
+    height: 30px;
+    width: 30px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .medical-information h5,
+  .browse-images h5,
+  .other-options h5 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .underline,
+  .underline-2,
+  .underline-3 {
+    font-size: 1.1rem !important;
+  }
+  
+  .medical-information .input-group-text {
+    min-width: 80px;
+    font-size: 0.75rem;
+  }
+  
+  .figure1 {
+    margin-bottom: 1rem;
+  }
+  
+  .img-container {
+    height: 120px;
+  }
+  
+  .cameraAdjustment {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .custom-control-inline {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  #camera-view {
+    height: 250px;
+  }
+  
+  .output img {
+    max-height: 100px;
+    max-width: 150px;
+  }
+}
+/* Camera CSS - Improved Modal */
+.modal-dialog {
+  max-width: 800px;
+  margin: 1.75rem auto;
+}
+
+.modal-content {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background: #2c3e50;
+  color: white;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1.5rem;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-header .close {
+  color: white;
+  opacity: 1;
+  text-shadow: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-header .close:hover {
+  opacity: 0.7;
+}
+
+.times {
+  font-size: 2rem;
+  font-weight: 300;
+}
+
+.modal-body {
+  height: auto;
+  min-height: 400px;
+  padding: 0 !important;
+  width: 100%;
+  background: #000;
+  position: relative;
+}
+
+.modal-body span {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+}
+
+#capture {
+  background: #dc3545;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  border: 3px solid white;
+  padding: 0;
   display: flex;
-  margin-left:1.5em;
-  margin-top:0.2em;
-  margin-bottom: 1em;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
-/* end of camera css */
 
+#capture:hover {
+  background: #c82333;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
 
-/* single image imports */
-.importsingleimage {
-  /* padding: 10px 20px; */
-  background-color: white;
-  padding-bottom: 5px;
-  color: #1b3c5f;
-  font-weight: 800;
+#capture img {
+  height: 35px;
+  width: 35px;
+  filter: brightness(0) invert(1);
+}
+
+#camera-view {
+  width: 100%;
+  height: 450px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+#camera-view #video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-footer {
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.output {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+}
+
+.output img {
+  max-height: 150px;
+  max-width: 200px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #dee2e6;
+}
+
+/* Camera Button Styling */
+.camera-button {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.col-a {
+  flex: 1;
+  min-width: 200px;
+}
+
+.col-b {
+  flex: 1;
+  min-width: 200px;
+}
+
+.col-b select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.col-b select:focus {
+  border-color: #2c3e50;
+  box-shadow: 0 0 0 0.15rem rgba(44, 62, 80, 0.15);
+  outline: none;
+}
+
+.cameraAdjustment {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+#camera_button {
+  width: 100%;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background: #007bff;
+  border: none;
+  color: white;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#camera_button:not(:disabled):hover {
+  background: #0056b3;
+}
+
+#camera_button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+#camera-warning {
+  display: block;
+  color: #dc3545;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* File Upload Styling */
+.custom-file-label {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.custom-file-label::after {
+  background: #495057;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+}
+
+.custom-file-input:focus ~ .custom-file-label {
+  border-color: #2c3e50;
+  box-shadow: 0 0 0 0.15rem rgba(44, 62, 80, 0.15);
+}
+
+/* Button Improvements */
+.btns {
+  display: block;
+  margin-top: auto;
+  padding-top: 2rem;
+}
+
+.btns.other-options {
+  margin-top: auto;
+  text-align: center;
+  padding: 2.5rem 1rem 1rem 1rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.btns .proceed {
+  display: inline-block;
+  padding: 0.85rem 3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  border-radius: 4px;
+  background: #1e3a8a;
   border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 0.25rem 0.5rem;
 }
+
+.btns .proceed:hover {
+  background: #1e40af;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.btns .reset {
+  display: inline-block;
+  padding: 0.6rem 1.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  background: #6c757d;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0.25rem 0.5rem;
+}
+
+.btns .reset:hover {
+  background: #5a6268;
+}
+
+/* Additional responsive behavior for small screens */
+@media screen and (max-width: 1200px) {
+  .row.downrow {
+    overflow-x: auto; /* Show horizontal scroll if needed */
+  }
+  
+  /* Force columns to stay side by side even on smaller screens */
+  .row.downrow > .col-md-7,
+  .row.downrow > .col-lg-7,
+  .row.downrow > .col-sm-6 {
+    flex: 7 1 0 !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  
+  .row.downrow > .col-md-5,
+  .row.downrow > .col-lg-5,
+  .row.downrow > .col-sm-4 {
+    flex: 5 1 0 !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  
+  .other-options {
+    padding: 1rem;
+  }
+  
+  .images-container {
+    padding: 1rem;
+  }
+  
+  .other-options h5 {
+    font-size: 1.1rem;
+  }
+  
+  .browse-images h5 {
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  /* Override Bootstrap's column behavior for small screens */
+  .row.downrow > [class*='col-'] {
+    flex-basis: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+  
+  .row.downrow > .col-md-7,
+  .row.downrow > .col-lg-7,
+  .row.downrow > .col-sm-6 {
+    flex: 7 1 0 !important;
+    min-width: 300px; /* Minimum width before horizontal scroll */
+  }
+  
+  .row.downrow > .col-md-5,
+  .row.downrow > .col-lg-5,
+  .row.downrow > .col-sm-4 {
+    flex: 5 1 0 !important;
+    min-width: 250px; /* Minimum width before horizontal scroll */
+  }
+  
+  .other-options .input-group-text {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .other-options .form-control {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Override Bootstrap's responsive behavior for very small screens */
+@media screen and (max-width: 768px) {
+  .row.downrow > [class*='col-'] {
+    flex-basis: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+  
+  .row.downrow > .col-md-7,
+  .row.downrow > .col-lg-7,
+  .row.downrow > .col-sm-6 {
+    flex: 7 1 0 !important;
+    min-width: 280px;
+  }
+  
+  .row.downrow > .col-md-5,
+  .row.downrow > .col-lg-5,
+  .row.downrow > .col-sm-4 {
+    flex: 5 1 0 !important;
+    min-width: 220px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .row.downrow > [class*='col-'] {
+    flex-basis: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+  
+  .row.downrow > .col-md-7,
+  .row.downrow > .col-lg-7,
+  .row.downrow > .col-sm-6 {
+    flex: 1 1 0 !important; /* Equal width on very small screens */
+    min-width: 250px;
+  }
+  
+  .row.downrow > .col-md-5,
+  .row.downrow > .col-lg-5,
+  .row.downrow > .col-sm-4 {
+    flex: 1 1 0 !important; /* Equal width on very small screens */
+    min-width: 200px;
+  }
+}
+
+/* end of camera css */

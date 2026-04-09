@@ -10,6 +10,7 @@
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="../assets/vendor/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.js"></script>
     <link rel="stylesheet" href="../assets/vendor/bootstrap-datepicker-1.6.4-dist/css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="../assets/css/camera.css">
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script> -->
     <script>if (window.module) module = window.module;</script>
 
@@ -265,8 +266,8 @@
         </div>
 
         <div class="col-md-5 col-sm-4 col-lg-5">
-            <div class="row">
-                <div class="other-options">
+            <div class="other-options">
+                <div>
                     <h5>
                         <span class="underline-3">Othe</span>r options
                     </h5>
@@ -321,9 +322,12 @@
 
                             <div class="col-a">
                                 <button type="button" id="camera_button" class="btn btn-primary" data-toggle="modal"
-                                    data-target="#exampleModal">
+                                    data-target="#exampleModal" disabled title="Please enter patient information first">
                                     Take Photos !
                                 </button>
+                                <small id="camera-warning" style="display: block; color: #dc3545; margin-top: 5px; font-size: 0.8em;">
+                                    Enter patient name first
+                                </small>
                             </div>
                         </div>
 
@@ -331,7 +335,7 @@
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
                             aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" id="camera-dialog" role="document">
+                            <div class="modal-dialog modal-dialog-centered camera-small" id="camera-dialog" role="document">
                                 <div class="modal-content" id="camera-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel">Camera</h5>
@@ -367,7 +371,7 @@
                                 </div>
                                 <div class="custom-file">
                                     <input type="file" class="custom-file-input" accept=".jpg,.png,.jpeg"
-                                        id="inputGroupFile01" min="6" max="6" multiple>
+                                        id="inputGroupFile01" multiple>
                                     <label class="custom-file-label" for="inputGroupFile01">Select files</label>
                                 </div>
                                 <div class="invalid-tooltip-11">
@@ -377,11 +381,10 @@
                         </div>
                     </form>
                 </div>
-            </div>
-            <div class="row ">
                 <div class="btns other-options">
                     <button class="proceed" id="proceed">PROCEED</button>
-                    <button class="reset" id="reset">Refresh</button>
+                    <button class="reset" id="reset">Clear Forms</button>
+                    <button class="btn back-button" style="background-color: #FF9933; color: white; padding: 8px 16px;" id="backToDashboard">Back to Dashboard</button>
                 </div>
             </div>
         </div>
@@ -390,6 +393,7 @@
         <script type="text/javascript">
             $(function () {
                 $('#sandbox-container .input-group.date').datepicker({
+                    format: 'dd/mm/yyyy',
                     maxViewMode: 3,
                     todayBtn: true,
                     autoclose: true,
@@ -399,6 +403,7 @@
             });
         </script>
         <script src="../renderer-process/handlefiles.js"></script>
+        <script src="../assets/js/imageprocessing.js"></script>
         <script src="../assets/js/camera.js"></script>
         <script src="../assets/js/imageimport.js"></script>
 </body>

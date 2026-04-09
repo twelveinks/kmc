@@ -5,40 +5,191 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../assets/css/app.css">
     <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <style>
+        #confirmationButtons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        #reportContent {
+            padding-top: 0px;
+        }
+        
+        /* Ensure proper 3-column layout for images on screen */
+        .report-images .row {
+            display: flex !important;
+            flex-wrap: wrap !important;
+        }
+        
+        .report-images .col-md-4 {
+            flex: 0 0 33.333333% !important;
+            max-width: 33.333333% !important;
+            display: block !important;
+        }
+        
+        .report-images figure {
+            display: block !important;
+            width: 100% !important;
+        }
+        
+        /* Force 3-column layout on all screen sizes */
+        @media (min-width: 768px) {
+            .report-images .col-md-4 {
+                flex: 0 0 33.333333% !important;
+                max-width: 33.333333% !important;
+            }
+        }
+        
+        @media print {
+            #confirmationButtons {
+                display: none !important;
+            }
+            
+            #reportContent {
+                padding-top: 0 !important;
+            }
+            
+            /* Maintain 3-column layout in PDF */
+            .col-md-4 {
+                width: 33.333333% !important;
+                float: left !important;
+                page-break-inside: avoid;
+            }
+            
+            /* Maintain other column widths */
+            .col-md-8, .col-lg-8 {
+                width: 66.666667% !important;
+                float: left !important;
+            }
+            
+            .col-md-12, .col-lg-12 {
+                width: 100% !important;
+            }
+            
+            /* Preserve image sizes */
+            .figure-img, .img-container img {
+                max-width: 100% !important;
+                height: auto !important;
+                object-fit: contain !important;
+            }
+            
+            .img-container {
+                width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Ensure rows display properly */
+            .row {
+                display: block !important;
+                width: 100% !important;
+            }
+            
+            .row::after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            
+            /* Prevent page breaks inside figures */
+            figure, .figure1 {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* Maintain spacing */
+            body {
+                margin: 0 !important;
+                padding: 0mm !important;
+            }
+        }
+        
+        /* Report image styling */
+        .report-images .image-container {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 240px !important;
+            overflow: hidden !important;
+            border-radius: 4px !important;
+            background: #f8f9fa !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-bottom: 1rem !important;
+            border: 1px solid #dee2e6 !important;
+        }
+        
+        .report-images .image-container img {
+            width: 100% !important;
+            max-height: 240px !important;
+            height: auto !important;
+            object-fit: cover !important;
+            margin: 0 !important;
+            border-radius: 4px !important;
+        }
+        
+        .report-images figure {
+            margin-bottom: 1.5rem !important;
+        }
+    </style>
     <!-- <script src="../../node_modules/jquery/dist/jquery.min.js"></script> -->
     <script type="text/javascript">
         const ipc = require('electron').ipcRenderer;
-        const BrowserWindow = require('electron').remote.BrowserWindow;
+        let reportResult = null;
 
-        ipc.on('insert-data', function (event, data, fromWindowId) {
-            const fromWindow = BrowserWindow.fromId(fromWindowId);
-            // fromWindow.webContents.send('inserted-data',number,result);
+        ipc.on('insert-data', function (event, data) {
+            var cart;
+            var result;
+            
             do {
-                var cart;
-                var result;
                 if (cart !== 'done') {
                     cart = addImage(data);
-                    //console.log(cart);
                 }
                 if (!result) {
                     result = datafunction(data);
-                    //console.log(result);
                 }
             } while (cart !== 'done' || !result);
-            ipc.send('open-information-dialog');
-            ipc.on('information-dialog-selection', (event, index) => {
-
-                if (index === 0) {
-                    // ipc.send('EndoReported',result);
-                    fromWindow.webContents.send('EndoReport', result);
-                } else fromWindow.webContents.send('Abort');
+            
+            reportResult = result;
+            
+            // Update doctor name
+            updateDoctorName(data);
+            
+            // Set up button handlers
+            document.getElementById('confirmSave').addEventListener('click', function() {
+                ipc.send('EndoReport', reportResult);
             });
-            ipc.send('getUserNames');
+            
+            document.getElementById('cancelSave').addEventListener('click', function() {
+                ipc.send('Abort');
+            });
         });
-        ipc.on('username', (event, arg) => {
-            var usernames = document.getElementById('doctor-physician');
-            usernames.innerHTML = arg;
-        });
+        
+        function updateDoctorName(data) {
+            if (data && data.doctorName) {
+                var usernames = document.getElementById('doctor-physician');
+                let displayName = data.doctorName;
+                if (!displayName.startsWith('Dr.')) {
+                    displayName = 'Dr. ' + displayName;
+                }
+                usernames.innerHTML = displayName;
+            } else {
+                // Fallback to getUserNames if doctorName not in data
+                ipc.send('getUserNames');
+                ipc.once('username', (event, arg) => {
+                    if (arg) {
+                        var usernames = document.getElementById('doctor-physician');
+                        let displayName = arg;
+                        if (!displayName.startsWith('Dr.')) {
+                            displayName = 'Dr. ' + displayName;
+                        }
+                        usernames.innerHTML = displayName;
+                    }
+                });
+            }
+        }
         function addImage(data) {
             var fig1 = document.getElementById('fig1');
             var fig2 = document.getElementById('fig2');
@@ -96,16 +247,40 @@
             fig6Caption.innerHTML = data.repo_caption6;
 
             var comb = data.repo_patientNo + ' ' + data.repo_name + ' ' + data.repo_date;
+            
+            // Update doctor name if present in data
+            if (data.doctorName) {
+                var doctorElem = document.getElementById('doctor-physician');
+                if (doctorElem) {
+                    let displayName = data.doctorName;
+                    if (!displayName.startsWith('Dr.')) {
+                        displayName = 'Dr. ' + displayName;
+                    }
+                    doctorElem.innerHTML = displayName;
+                }
+            }
 
             return (comb);
+        }
+        function imageAdjust() {
+            // Removed problematic manual styling - now handled by CSS
         }
     </script>
 </head>
 
-<body class="report">
+<body class="report" onload="imageAdjust()">
+    <!-- Confirmation Buttons - Fixed at Top -->
+    <div id="confirmationButtons" style="text-align: center; padding: 1rem 2rem; background: #001f3f; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+        <span style="color: white; font-size: 1rem; margin-right: 2rem; font-weight: 500;">Review the report below</span>
+        <button id="confirmSave" style="padding: 0.6rem 2rem; font-size: 1rem; background: #22c55e; color: white; border: none; border-radius: 4px; margin: 0 0.5rem; cursor: pointer; font-weight: 600;">✓ Save Report</button>
+        <button id="cancelSave" style="padding: 0.6rem 2rem; font-size: 1rem; background: #dc3545; color: white; border: none; border-radius: 4px; margin: 0 0.5rem; cursor: pointer; font-weight: 600;">✗ Cancel</button>
+    </div>
+    
+    <!-- Report Content -->
+    <div id="reportContent">
     <div class="row">
         <div class="col-md-12 logo">
-            <img src="../assets/img/header13.png">
+            <img src="../assets/img/headerupdated.png">
         </div>
     </div>
     <div class="row ">
@@ -267,7 +442,6 @@
                                 </td>
                                 <td class="repo-Biopsy-site">
                                     <span id="repo-Biopsy-site">
-
                                     </span>
                                 </td>
                             </tr>
@@ -291,19 +465,31 @@
             </div>
             <div class="row doctor-physician-container">
                 <div class="col-md-12">
-                    <p>Examining Doctor/Physician: <span class="doctor-physician" id="doctor-physician"></span></p>
-                    <div class="row">
-                        <p>This Report is for Clinical Reference!!</p>
-                        <p>Signature: _________________</p>
-                    </div>
-
+                    <table style="width: 100%; margin-bottom: 1rem; border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 60%; text-align: left; border: none; font-size: 17px;">
+                                Examining Doctor/Physician: <span class="doctor-physician" id="doctor-physician" style="font-size: 17px;"></span>
+                            </td>
+                            <td style="width: 40%; text-align: right; border: none; font-size: 17px;">
+                                Signature: _________________
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="width: 100%; margin-bottom: 1rem; border-collapse: collapse;">
+                        <tr>
+                            <td style="width: 60%; text-align: left; border: none;">
+                                This Report is for Clinical Reference!!
+                            </td>
+                            <td style="width: 40%; text-align: right; border: none; font-size: 12px; color: #666; font-weight: normal;">
+                                Developed by Twelveinks (www.twelveinks.com)
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <div style="position: absolute; left: 65%; margin-top: 3em;">
-        <p>&copy Developed by Twelveinks Company Ltd (www.twelveinks.com)</p>
-    </div>
+    </div> <!-- Close reportContent div -->
 </body>
 
 </html>

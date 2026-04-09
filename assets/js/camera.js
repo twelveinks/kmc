@@ -19,38 +19,65 @@ var startbutton = null;
 var data = null;
 var homeDir = require('os').homedir();
 
+// Validation: Enable camera button only when patient info is filled
+function validatePatientInfo() {
+  const firstName = document.getElementById('firstName');
+  const lastName = document.getElementById('lastName');
+  const patientNo = document.getElementById('patient_no');
+  const cameraWarning = document.getElementById('camera-warning');
+  
+  if (firstName && lastName && patientNo) {
+    const isValid = firstName.value.trim() !== '' && 
+                    lastName.value.trim() !== '' && 
+                    patientNo.value.trim() !== '';
+    
+    button.disabled = !isValid;
+    
+    if (isValid) {
+      button.title = 'Click to open camera';
+      if (cameraWarning) cameraWarning.style.display = 'none';
+    } else {
+      button.title = 'Please enter patient information first';
+      if (cameraWarning) cameraWarning.style.display = 'block';
+    }
+  }
+}
+
+// Add event listeners to patient info fields
+document.addEventListener('DOMContentLoaded', function() {
+  const firstName = document.getElementById('firstName');
+  const lastName = document.getElementById('lastName');
+  const patientNo = document.getElementById('patient_no');
+  
+  if (firstName) firstName.addEventListener('input', validatePatientInfo);
+  if (lastName) lastName.addEventListener('input', validatePatientInfo);
+  if (patientNo) patientNo.addEventListener('input', validatePatientInfo);
+  
+  // Run validation on page load
+  validatePatientInfo();
+});
+
 // camera to enlarge screen and decrease screen
 cameraRadioL.addEventListener('change', () => {
   if (cameraRadioL.checked) {
-      video.style.height='40rem';
-      video.style.width='65rem';
-      cameraBody.style.height='40rem';
-      cameraBody.style.width='65rem';
-      cameraView.style.height='40rem';
-      cameraView.style.width='65rem';
-      cameraContent.style.width='67rem';
-      cameraDialog.style.width='67rem';
-      cameraDialog.style.marginLeft='10%';
-      
+    cameraDialog.classList.remove('camera-small');
+    cameraDialog.classList.add('camera-large');
+    cameraBody.style.height = '80vh';
   }
 });
 
 cameraRadioS.addEventListener('change', () => {
   if (cameraRadioS.checked) {
-    video.style.height='20rem';
-    video.style.width='33rem'; 
-    cameraBody.style.height='20rem';
-    cameraBody.style.width='33rem';
-    cameraView.style.width='33rem';
-    cameraContent.style.width='34rem';
-    cameraView.style.height='33rem';
-    cameraDialog.style.marginLeft='30%';  
+    cameraDialog.classList.remove('camera-large');
+    cameraDialog.classList.add('camera-small');
+    cameraBody.style.height = '400px';
   }
 });
 
+const settings = require('../lib/settings.js');
+
 var folders = {};
-// #olders.baseDir = path.join(homeDir, '/desktop/ENDO');
-folders.baseDir = path.join(homeDir,'/ENDO');
+folders.baseDir = settings.get('photoSavePath');
 folders.create = function (name, data, callback) {
   // converting blob data before use
   // var filename='myimage.png';
@@ -146,6 +173,15 @@ function stopMediaTracks(stream) {
     track.stop();
   });
 }
+
+// Add event listener for modal closing
+document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function (e) {
+  if (typeof currentStream !== 'undefined') {
+    stopMediaTracks(currentStream);
+    video.srcObject = null;
+    currentStream = undefined;
+  }
+});
 
 function gotDevices(mediaDevices) {
   select.innerHTML = '';
@@ -277,8 +313,14 @@ navigator.mediaDevices.enumerateDevices().then(gotDevices);
   function takepicture() {
     var firstname = document.getElementById('firstName').value;
     var lastname= document.getElementById('lastName').value;
-    
     var patientno=document.getElementById('patient_no').value;
+    
+    // Safety check: Prevent taking photos without patient information
+    if (!firstname.trim() || !lastname.trim() || !patientno.trim()) {
+      alert('Please enter patient information (First Name, Last Name, and Patient Number) before taking photos.');
+      return;
+    }
+    
     var foldername=firstname+' '+lastname+' '+patientno; 
     var context = canvas.getContext('2d');
     if (width && height) {
@@ -286,9 +328,14 @@ navigator.mediaDevices.enumerateDevices().then(gotDevices);
       canvas.height = height;
       context.drawImage(video, 0, 0, width, height);
       data = canvas.toDataURL('image/png');
-      photo.setAttribute('src', data);
-      // console.log('take picture'+data);
-      folders.create(foldername, data, 'err');
+      
+      // Process the captured image to crop black sections
+      processImageDataUrl(data, function(processedDataUrl) {
+        photo.setAttribute('src', processedDataUrl);
+        // Store the processed image data
+        data = processedDataUrl;
+        folders.create(foldername, data, 'err');
+      });
 
     } else {
       clearphoto();
@@ -330,10 +377,10 @@ function b64toBlob(b64Data, contentType, sliceSize) {
   return blob;
 }
 document.getElementById('photo').addEventListener('click',function(err){
-  if(!err){
-    window.open(folders.baseDir);
-    console.log(err);
-  }else{
-    alert('cannot open directory');
+  const currentPath = settings.get('photoSavePath');
+  if(!err && fs.existsSync(currentPath)){
+    window.open(currentPath);
+  } else {
+    alert('Cannot open photos directory. Please check the save location in Preferences.');
   }
 });

@@ -8,9 +8,31 @@
     <!-- <script src="../node_modules/jquery/dist/jquery.min.js"></script> -->
     <script type="text/javascript">
         const ipc = require('electron').ipcRenderer;
-        const BrowserWindow = require('electron').remote.BrowserWindow;
+        
+        // Request doctor's name when document loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Requesting doctor name...');
+            ipc.send('getUserNames');
+        });
+
+        function getBrowserWindow() {
+            try {
+                const { remote } = require('electron');
+                if (remote && remote.BrowserWindow) {
+                    return remote.BrowserWindow;
+                }
+            } catch (err) {
+                console.error('Error accessing remote BrowserWindow:', err);
+            }
+            return null;
+        }
 
         ipc.on('insert-data', function (event, data, fromWindowId) {
+            const BrowserWindow = getBrowserWindow();
+            if (!BrowserWindow) {
+                console.error('BrowserWindow not available');
+                return;
+            }
             const fromWindow = BrowserWindow.fromId(fromWindowId);
             // fromWindow.webContents.send('inserted-data',number,result);
             do{
@@ -34,12 +56,18 @@
                     fromWindow.webContents.send('Ent', result);
                 } else fromWindow.webContents.send('Abort');
             });
-            ipc.send('getUserNames');
         });
 
         ipc.on('username', (event, arg) => {
             var usernames = document.getElementById('doctor-physician');
-            usernames.innerHTML = arg;
+            let displayName = arg;
+            if (typeof arg === 'object' && arg.firstName && arg.lastName) {
+                displayName = arg.firstName + ' ' + arg.lastName;
+            }
+            if (!displayName.startsWith('Dr.')) {
+                displayName = 'Dr. ' + displayName;
+            }
+            usernames.innerHTML = displayName;
         });
         function addImage(data) {
             var fig1 = document.getElementById('fig1');
@@ -93,7 +121,7 @@
 <body class="report">
     <div class="row">
         <div class="col-md-2 logo">
-            <img src="../assets/img/logo.png">
+            <img src="../assets/img/headerupdated.png">
         </div>
         <div class="col-md-6">
             <h4>CASE MEDICAL CENTER</h4>
@@ -203,12 +231,20 @@
             </div>
             <div class="row doctor-physician-container">
                 <div class="col-md-12">
-                    <p>Examining Doctor/Physician: <span class="doctor-physician" id="doctor-physician"></span></p>
                     <div class="row">
-                        <p>This Report is for Clinical Reference!!</p>
-                        <p>Signature: _________________</p>
+                        <div class="col-md-6">
+                            <p style="text-align: left; margin-bottom: 0.5rem;">Examining Doctor/Physician: <span class="doctor-physician" id="doctor-physician"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p style="text-align: right; margin-bottom: 0.5rem;">Signature: _________________</p>
+                        </div>
                     </div>
-
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p style="text-align: left; margin-bottom: 0.5rem;">This Report is for Clinical Reference!!</p>
+                            <p style="text-align: right; margin-bottom: 1rem; font-size: 12px; color: #666; font-weight: normal;">Developed by Twelveinks (www.twelveinks.com)</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

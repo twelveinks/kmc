@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Settings - Med-Scope</title>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <style>
+        .settings-container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .settings-header {
+            margin-bottom: 40px;
+        }
+
+        .settings-header h2 {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .settings-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+
+        .settings-card .card-body {
+            padding: 25px;
+        }
+
+        .settings-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .bg-users { background-color: #007bff; }
+        .bg-templates { background-color: #28a745; }
+        .bg-preferences { background-color: #6f42c1; }
+        .bg-backup { background-color: #fd7e14; }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .settings-description {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="../assets/img/headerupdated.png" alt="Med-Scope Logo">
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="users.html">Users</a></li>
+            <li><a href="#" onclick="window.close()">Close</a></li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <div class="settings-container">
+            <div class="settings-header">
+                <h2>Settings</h2>
+            </div>
+
+            <div class="row">
+                <!-- User Management -->
+                <div class="col-md-6">
+                    <div class="settings-card" onclick="openUserManagement()">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="settings-icon bg-users">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <h3 class="settings-title">User Management</h3>
+                                    <p class="settings-description">Add, edit, or remove user accounts and permissions</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template Management -->
+                <div class="col-md-6">
+                    <div class="settings-card" onclick="openTemplateManagement()">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="settings-icon bg-templates">
+                                    <i class="fas fa-folder-plus"></i>
+                                </div>
+                                <div>
+                                    <h3 class="settings-title">Template Management</h3>
+                                    <p class="settings-description">Create and manage custom form templates</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Preferences -->
+                <div class="col-md-6">
+                    <div class="settings-card" onclick="openPreferences()">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="settings-icon bg-preferences">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div>
+                                    <h3 class="settings-title">System Preferences</h3>
+                                    <p class="settings-description">Configure application settings and defaults</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup & Restore -->
+                <div class="col-md-6">
+                    <div class="settings-card" onclick="openBackupRestore()">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="settings-icon bg-backup">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div>
+                                    <h3 class="settings-title">Backup & Restore</h3>
+                                    <p class="settings-description">Manage data backups and restoration</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const remote = require('@electron/remote');
+
+        // Initialize getCurrentWindow
+        const currentWindow = remote.getCurrentWindow();
+
+        function openUserManagement() {
+            ipcRenderer.send('openSection', 'users');
+        }
+
+        function openTemplateManagement() {
+            ipcRenderer.send('openSection', 'templates');
+        }
+
+        function openPreferences() {
+            ipcRenderer.send('openSection', 'preferences');
+        }
+
+        function openBackupRestore() {
+            ipcRenderer.send('openSection', 'backup');
+        }
+    </script>
+</body>
+</html>

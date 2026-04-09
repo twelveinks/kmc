@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Operation Report</title>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .document-container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 297mm; /* Full A4 height */
+            height: auto;
+            position: relative;
+            padding-bottom: 80px; /* More space for footer */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .document-header {
+            padding: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .document-header img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .document-content {
+            padding: 40px 60px;
+            flex: 1; /* Take up remaining space */
+        }
+        
+        .document-title {
+            text-align: center;
+            color: #8B0000;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        
+        .editable-area {
+            min-height: 400px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.8;
+            outline: none;
+        }
+        
+        .editor-toolbar {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-bottom: none;
+            padding: 8px 10px;
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 8px;
+            align-items: center;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        .editor-toolbar button,
+        .editor-toolbar select {
+            padding: 5px 8px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .editor-toolbar select {
+            max-width: 80px;
+        }
+        
+        .editor-toolbar button:hover {
+            background: #e9ecef;
+        }
+        
+        .editor-toolbar button.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .editor-toolbar .separator {
+            width: 1px;
+            height: 20px;
+            background: #ccc;
+            margin: 0 3px;
+            flex-shrink: 0;
+        }
+        
+        .editor-toolbar input[type="color"] {
+            width: 35px;
+            height: 28px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            padding: 2px;
+            flex-shrink: 0;
+            border-radius: 3px;
+        }
+        
+        .color-picker-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .color-picker-wrapper button {
+            position: relative;
+            padding: 5px 10px;
+        }
+        
+        .color-picker-wrapper input[type="color"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+        
+        .editable-area:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        
+        .doctor-signature {
+            margin-top: 60px;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+        }
+        
+        .signature-line {
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 2;
+        }
+        
+        .signature-line.empty-field {
+            display: none !important;
+        }
+        
+        .signature-line strong {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .signature-line input {
+            border: none;
+            border-bottom: 1px solid #333;
+            padding: 2px 5px;
+            font-size: 14px;
+            background: transparent;
+            min-width: 300px;
+        }
+        
+        .editable-area-wrapper {
+            margin: 20px 0;
+        }
+        
+        .signature-line input:focus {
+            outline: none;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .signature-space {
+            margin-top: 50px;
+            border-top: 1px solid #333;
+            width: 250px;
+            padding-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .footer-credit {
+            position: fixed;
+            bottom: 12px;  /* Small offset from bottom */
+            right: 60px;
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            top: 1500px;  /* Fixed position from top */
+            height: 20px;
+            z-index: 1000;
+            background: white;
+        }
+        
+        .optional-field {
+            opacity: 1;
+        }
+        
+        .hide-for-pdf {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 0 !important;
+        }
+        
+        .action-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        .back-button button {
+            padding: 12px 28px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: normal;
+            background: #FF9933;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 160px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button button:hover {
+            background: #e88826;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .action-buttons button {
+            margin-left: 10px;
+            padding: 10px 25px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-save {
+            background: #4a90e2;  /* Primary color */
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #357abd;
+        }
+        
+        .btn-print {
+            background: #47d185;  /* Success color */
+            color: white;
+        }
+        
+        .btn-print:hover {
+            background: #3ab76f;
+        }
+        
+        .btn-cancel {
+            background: #ff6b6b;  /* Danger color */
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background: #ff5252;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .action-buttons,
+            .back-button {
+                display: none !important;
+            }
+            
+            .document-container {
+                box-shadow: none;
+                max-width: 100%;
+                page-break-after: always;
+            }
+            
+            .signature-line input {
+                border-bottom: none;
+            }
+            
+            .optional-field.empty,
+            .hide-for-pdf {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .editor-toolbar {
+                display: none !important;
+            }
+            
+            .editable-area {
+                border: none !important;
+            }
+            
+            .footer-credit {
+                font-size: 10px;
+                position: fixed !important;
+                top: 1500px !important;
+                right: 60px !important;
+                bottom: 12px !important;
+                left: auto !important;
+                text-align: right !important;
+                width: auto !important;
+                background: white !important;
+                z-index: 1000 !important;
+                height: 20px !important;
+            }
+            
+            .document-container {
+                min-height: 297mm;
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="back-button">
+        <button onclick="goBack()">
+            <i class="fa fa-arrow-left"></i> Back to Dashboard
+        </button>
+    </div>
+    
+    <div class="action-buttons">
+        <button class="btn-print" onclick="printDocument()">
+            <i class="fa fa-print"></i> Print
+        </button>
+        <button class="btn-save" onclick="saveDocument()">
+            <i class="fa fa-save"></i> Save as PDF
+        </button>
+    </div>
+
+    <div class="document-container">
+        <div class="document-header">
+            <img src="../assets/img/headerupdated.png" alt="Hospital Header">
+        </div>
+        
+        <div class="document-content">
+            <div class="document-title">Operation Report</div>
+            
+            <div class="date-line" style="margin-bottom: 20px;">
+                <strong>Date of Operation:</strong> <span id="currentDate"></span>
+            </div>
+            
+            <div class="editable-area-wrapper">
+                <div class="editor-toolbar">
+                    <select onchange="formatDoc('fontName', this.value); this.selectedIndex=0;">
+                        <option selected disabled>Font</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times</option>
+                        <option value="Georgia">Georgia</option>
+                    </select>
+                    
+                    <select onchange="formatDoc('fontSize', this.value); this.selectedIndex=0;">
+                        <option selected disabled>Size</option>
+                        <option value="1">10</option>
+                        <option value="3">14</option>
+                        <option value="5">18</option>
+                        <option value="7">24</option>
+                    </select>
+                    
+                    <div class="separator"></div>
+                    
+                    <button type="button" onclick="formatDoc('bold')" title="Bold">
+                        <i class="fa fa-bold"></i>
+                    </button>
+                    <button type="button" onclick="formatDoc('italic')" title="Italic">
+                        <i class="fa fa-italic"></i>
+                    </button>
+                    <button type="button" onclick="formatDoc('underline')" title="Underline">
+                        <i class="fa fa-underline"></i>
+                    </button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button type="button" onclick="formatDoc('justifyLeft')" title="Align Left">
+                        <i class="fa fa-align-left"></i>
+                    </button>
+                    <button type="button" onclick="formatDoc('justifyCenter')" title="Center">
+                        <i class="fa fa-align-center"></i>
+                    </button>
+                    <button type="button" onclick="formatDoc('justifyRight')" title="Align Right">
+                        <i class="fa fa-align-right"></i>
+                    </button>
+                    <button type="button" onclick="formatDoc('justifyFull')" title="Justify">
+                        <i class="fa fa-align-justify"></i>
+                    </button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button type="button" onclick="formatDoc('insertUnorderedList')" title="Bullet List">
+                        <i class="fa fa-list-ul"></i>
+                    </button>
+                    <button type="button" onclick="formatDoc('insertOrderedList')" title="Numbered List">
+                        <i class="fa fa-list-ol"></i>
+                    </button>
+                    
+                    <div class="separator"></div>
+                    
+                    <div class="color-picker-wrapper">
+                        <button type="button" title="Text Color">
+                            <i class="fa fa-font" style="color: #333;"></i>
+                        </button>
+                        <input type="color" onchange="formatDoc('foreColor', this.value)" title="Text Color">
+                    </div>
+                </div>
+                
+                <div contenteditable="true" class="editable-area" id="operationContent">
+                <p><strong>Patient Information:</strong></p>
+                <p><strong>Name:</strong> </p>
+                <p><strong>Age/Sex:</strong> </p>
+                <p><strong>Hospital Number:</strong> </p>
+                <br>
+                <p><strong>Pre-operative Diagnosis:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Post-operative Diagnosis:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Operation Performed:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Surgeon:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Assistant:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Anaesthesia:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Indications for Operation:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Procedure Details:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Findings:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Complications:</strong></p>
+                <p>None</p>
+                <br>
+                <p><strong>Estimated Blood Loss:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Specimens Sent:</strong></p>
+                <p></p>
+                <br>
+                <p><strong>Post-operative Instructions:</strong></p>
+                <p></p>
+            </div>
+            </div>
+            
+            <div class="doctor-signature">
+                <div class="signature-space">
+                    Signature
+                </div>
+                
+                <div class="signature-line">
+                    <strong>Doctor:</strong> <input type="text" id="doctorName" placeholder="Dr. Enter name">
+                </div>
+                
+                <div class="signature-line optional-field" id="contactLine">
+                    <strong>Contact Number:</strong> <input type="text" id="contactNumber" placeholder="Optional">
+                </div>
+                
+                <div class="signature-line optional-field" id="emailLine">
+                    <strong>Email:</strong> <input type="text" id="email" placeholder="Optional">
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-credit">
+            Developed by Twelveinks (www.twelveinks.com)
+        </div>
+    </div>    <script>
+        const { ipcRenderer } = require('electron');
+        
+        // Set current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const date = new Date();
+            const formattedDate = date.toLocaleDateString('en-GB', { 
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            document.getElementById('currentDate').textContent = formattedDate;
+            
+            // Get logged in doctor's name with Dr. prefix
+            ipcRenderer.send('getUserNames');
+            ipcRenderer.on('username', (event, username) => {
+                console.log('Received username:', username);
+                if (typeof username === 'object') {
+                    const fullName = username.firstName + ' ' + username.lastName;
+                    document.getElementById('doctorName').value = 'Dr. ' + fullName;
+                } else {
+                    document.getElementById('doctorName').value = 'Dr. ' + username;
+                }
+            });
+        });
+        
+        function printDocument() {
+            // Hide empty optional fields before printing
+            const contactInput = document.getElementById('contactNumber');
+            const emailInput = document.getElementById('email');
+            const contactLine = document.getElementById('contactLine');
+            const emailLine = document.getElementById('emailLine');
+            
+            if (!contactInput.value || contactInput.value.trim() === '') {
+                contactLine.style.display = 'none';
+            }
+            if (!emailInput.value || emailInput.value.trim() === '') {
+                emailLine.style.display = 'none';
+            }
+            
+            // Wait for DOM to update
+            setTimeout(() => {
+                window.print();
+                
+                // Restore visibility after print dialog
+                setTimeout(() => {
+                    contactLine.style.display = '';
+                    emailLine.style.display = '';
+                }, 100);
+            }, 100);
+        }
+        
+        function saveDocument() {
+            // Add empty-field class to empty optional fields
+            const contactInput = document.getElementById('contactNumber');
+            const emailInput = document.getElementById('email');
+            const contactLine = document.getElementById('contactLine');
+            const emailLine = document.getElementById('emailLine');
+            
+            if (!contactInput.value || contactInput.value.trim() === '') {
+                contactLine.classList.add('empty-field');
+            }
+            if (!emailInput.value || emailInput.value.trim() === '') {
+                emailLine.classList.add('empty-field');
+            }
+            
+            console.log('Contact empty:', contactLine.classList.contains('empty-field'));
+            console.log('Email empty:', emailLine.classList.contains('empty-field'));
+            
+            // Extract patient info from content for filename
+            const operationContent = document.getElementById('operationContent');
+            let patientInfo = { id: '', firstName: '', lastName: '' };
+            
+            // Get all text content
+            const fullText = operationContent.innerText;
+            console.log('Full text:', fullText);
+            
+            // Extract name - look for "Name:" followed by the value (may be on same or next line)
+            const nameMatch = fullText.match(/Name:\s*([^\n]+)/);
+            if (nameMatch) {
+                let nameValue = nameMatch[1].trim();
+                // Remove any trailing field labels
+                nameValue = nameValue.split('Age/Sex:')[0].split('Hospital Number:')[0].trim();
+                
+                console.log('Extracted name:', nameValue);
+                
+                if (nameValue && nameValue.length > 0) {
+                    const nameParts = nameValue.split(' ').filter(n => n.length > 0);
+                    if (nameParts.length >= 2) {
+                        patientInfo.firstName = nameParts[0];
+                        patientInfo.lastName = nameParts[nameParts.length - 1];
+                    } else if (nameParts.length === 1) {
+                        patientInfo.firstName = nameParts[0];
+                    }
+                }
+            }
+            
+            // Extract hospital number
+            const idMatch = fullText.match(/Hospital Number:\s*([^\n]+)/);
+            if (idMatch) {
+                let idValue = idMatch[1].trim();
+                // Remove any trailing field labels
+                idValue = idValue.split('Pre-operative')[0].split('Post-operative')[0].trim();
+                
+                console.log('Extracted hospital number:', idValue);
+                
+                if (idValue && idValue.length > 0) {
+                    patientInfo.id = idValue;
+                }
+            }
+            
+            console.log('Final patient info:', patientInfo);
+            
+            // Send signal to save with patient info
+            ipcRenderer.send('saveOperationAsPDF', patientInfo);
+        }
+        
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+        
+        function formatDoc(command, value) {
+            document.execCommand(command, false, value);
+            document.getElementById('operationContent').focus();
+        }
+    </script>
+</body>
+</html>

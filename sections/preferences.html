@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Preferences - Med-Scope</title>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <style>
+        .preferences-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .preferences-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .section-title {
+            color: #FF9933;
+            font-size: 1.2em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FF9933;
+        }
+
+        .preference-item {
+            margin-bottom: 20px;
+        }
+
+        .preference-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .preference-description {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .path-display {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .btn-primary {
+            background-color: #FF9933;
+            border-color: #FF9933;
+        }
+
+        .btn-primary:hover {
+            background-color: #e88826;
+            border-color: #e88826;
+        }
+
+        .save-indicator {
+            color: #28a745;
+            font-size: 0.9em;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .form-switch {
+            padding-left: 2.5em;
+        }
+
+        .form-switch .form-check-input {
+            width: 3em;
+        }
+
+        .form-switch .form-check-input:checked {
+            background-color: #FF9933;
+            border-color: #FF9933;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            color: white;
+        }
+
+        .btn-secondary i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="preferences-container" style="margin-top: 20px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="m-0">Save Locations</h2>
+            <button class="btn btn-secondary" onclick="closeWindow()">
+                <i class="fa fa-times"></i> Close
+            </button>
+        </div>
+
+        <div class="preferences-section">
+            <div class="preference-item">
+                <div class="preference-label">Patient Photos Location</div>
+                <div class="preference-description">Choose where patient photos will be saved</div>
+                <div class="path-display" id="photoPathDisplay">Loading...</div>
+                <button class="btn btn-primary" onclick="changePhotoPath()">Change Location</button>
+            </div>
+            
+            <div class="preference-item mt-4">
+                <div class="preference-label">Reports Save Location</div>
+                <div class="preference-description">Choose where patient reports will be saved</div>
+                <div class="path-display" id="reportPathDisplay">Loading...</div>
+                <button class="btn btn-primary" onclick="changeReportPath()">Change Location</button>
+            </div>
+
+            <div class="preference-item mt-4">
+                <div class="preference-label">Operation Reports Location</div>
+                <div class="preference-description">Choose where operation reports will be saved</div>
+                <div class="path-display" id="operationPathDisplay">Loading...</div>
+                <button class="btn btn-primary" onclick="changeOperationPath()">Change Location</button>
+            </div>
+
+            <div class="preference-item mt-4">
+                <div class="preference-label">Referral Reports Location</div>
+                <div class="preference-description">Choose where referral reports will be saved</div>
+                <div class="path-display" id="referralPathDisplay">Loading...</div>
+                <button class="btn btn-primary" onclick="changeReferralPath()">Change Location</button>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button class="btn btn-secondary" onclick="resetToDefaults()">Reset to Defaults</button>
+            <span class="save-indicator" id="saveIndicator">Settings saved!</span>
+        </div>
+    </div>
+
+    <script>
+        const path = require('path');
+        const settings = require('../lib/settings.js');
+        const { app, dialog, getCurrentWindow } = require('@electron/remote');
+        const fs = require('fs');
+        
+        // Ensure settings directory exists
+        const settingsDir = path.dirname(settings.settingsPath);
+        if (!fs.existsSync(settingsDir)) {
+            fs.mkdirSync(settingsDir, { recursive: true });
+        }
+
+        // Initialize all preferences
+        function initializePreferences() {
+            const pathMappings = {
+                'photoPathDisplay': 'photoSavePath',
+                'reportPathDisplay': 'reportSavePath',
+                'operationPathDisplay': 'operationSavePath',
+                'referralPathDisplay': 'referralSavePath'
+            };
+
+            for (const [displayId, settingKey] of Object.entries(pathMappings)) {
+                const element = document.getElementById(displayId);
+                if (element) {
+                    element.textContent = settings.get(settingKey) || 'Not set';
+                } else {
+                    console.error('Display element not found:', displayId);
+                }
+            }
+        }
+
+        // Show save indicator
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // Generic function to change path
+        async function changePath(settingKey, title) {
+            try {
+                console.log('Changing path for:', settingKey);
+                console.log('Current settings:', settings.getAll());
+                
+                const currentWindow = getCurrentWindow();
+                const result = await dialog.showOpenDialog(currentWindow, {
+                    properties: ['openDirectory'],
+                    title: title,
+                    defaultPath: settings.get(settingKey) || app.getPath('documents') // Start from current path or documents
+                });
+
+                if (!result.canceled && result.filePaths.length > 0) {
+                    const newPath = result.filePaths[0];
+                    
+                    // Create directory if it doesn't exist
+                    if (!fs.existsSync(newPath)) {
+                        fs.mkdirSync(newPath, { recursive: true });
+                    }
+                    
+                    // Save the new path
+                    settings.set(settingKey, newPath);
+                    
+                    // Update display
+                    const displayElementId = settingKey.replace('SavePath', '') + 'PathDisplay';
+                    const displayElement = document.getElementById(displayElementId);
+                    if (displayElement) {
+                        displayElement.textContent = newPath;
+                        showSaveIndicator();
+                    } else {
+                        console.error('Display element not found:', displayElementId);
+                    }
+                    
+                    // Log for debugging
+                    console.log({
+                        settingKey,
+                        displayElementId,
+                        newPath,
+                        currentSettings: settings.getAll()
+                    });
+                    
+                    // Log for debugging
+                    console.log(`Updated ${settingKey} to:`, newPath);
+                    console.log('Current settings:', settings.getAll());
+                }
+            } catch (error) {
+                console.error('Error changing path:', error);
+                alert('Error changing path: ' + error.message);
+            }
+        }
+
+        // Path change handlers
+        async function changePhotoPath() {
+            await changePath('photoSavePath', 'Choose Photo Save Location');
+        }
+
+        async function changeReportPath() {
+            await changePath('reportSavePath', 'Choose Reports Save Location');
+        }
+
+        async function changeOperationPath() {
+            await changePath('operationSavePath', 'Choose Operation Reports Location');
+        }
+
+        async function changeReferralPath() {
+            await changePath('referralSavePath', 'Choose Referral Reports Location');
+        }
+
+        // Reset to defaults
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all save locations to their default values?')) {
+                settings.resetToDefaults();
+                initializePreferences();
+                showSaveIndicator();
+            }
+        }
+
+        function closeWindow() {
+            getCurrentWindow().close();
+        }
+
+        // Initialize on load
+        initializePreferences();
+    </script>
+</body>
+</html>
