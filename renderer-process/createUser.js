@@ -51,7 +51,7 @@ document.querySelector('.createAccount').addEventListener('click', () => {
                         if (!err) {
                             alert('user has been created successfully!!!');
                         } else {
-                            alert(err);
+                            alert('User already exists, Please login or use a different username');
                         }
                     });
                 } else {

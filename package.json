@@ -1,7 +1,7 @@
 {
   "name": "medical-scope-report",
   "productName": "Medical Scope Report",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "This is a medical application for creating pdf reports got from a scope machine",
   "main": "main.js",
   "scripts": {
@@ -15,15 +15,15 @@
   "author": "Twelveinks Company Limited",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^3.1.7",
-    "electron-packager": "^13.1.1"
+    "electron": "^38.4.0",
+    "electron-packager": "^17.1.2"
   },
   "dependencies": {
     "devtron": "^1.4.0",
-    "electron-pdf": "^1.2.5",
-    "electron-pdf-window": "^1.0.12",
+    "electron-pdf": "^25.0.0",
+    "electron-pdf-window": "^1.0.0",
     "image-compressor.js": "^1.1.4",
-    "jimp": "^0.6.0",
+    "jimp": "^1.6.0",
     "jquery": "^3.4.1",
     "jquery-ui": "^1.12.1",
     "js-datepicker": "^4.0.6",
