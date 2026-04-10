@@ -192,11 +192,8 @@ function initialize() {
   }
 
   app.on('ready', () => {
-    // Set the application menu for Windows and Linux
-    if (process.platform !== 'darwin') {
-      const menu = Menu.buildFromTemplate(template);
-      Menu.setApplicationMenu(menu);
-    }
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
     createWindow();
     startDicomServices();
   })
