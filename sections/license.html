@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Activation Required — Med Scope Report</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.11);
+      padding: 36px 40px;
+      max-width: 460px;
+      width: 90%;
+      text-align: center;
+    }
+    .logo {
+      max-height: 70px;
+      max-width: 260px;
+      margin-bottom: 18px;
+      object-fit: contain;
+    }
+    .trial-badge {
+      display: inline-block;
+      background: #fff3cd;
+      color: #7d5a00;
+      border: 1px solid #ffc107;
+      border-radius: 20px;
+      padding: 3px 14px;
+      font-size: 0.82em;
+      margin-bottom: 14px;
+    }
+    h4 { color: #222; margin-bottom: 6px; font-size: 1.15em; }
+    .sub { color: #777; font-size: 0.88em; margin-bottom: 24px; line-height: 1.5; }
+    .id-block {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 12px 14px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    .id-block label {
+      font-size: 0.75em;
+      color: #666;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .id-row { display: flex; gap: 7px; }
+    .id-row input {
+      flex: 1;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 0.83em;
+      background: white;
+      color: #333;
+      min-width: 0;
+      font-family: monospace;
+    }
+    .id-row button {
+      background: #6c757d;
+      border: none;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 5px;
+      font-size: 0.8em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .id-row button:hover { background: #5a6268; }
+    .key-input {
+      border: 1px solid #ced4da;
+      border-radius: 7px;
+      padding: 10px 14px;
+      width: 100%;
+      font-size: 0.92em;
+      font-family: monospace;
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .key-input:focus {
+      outline: none;
+      border-color: #FF9933;
+      box-shadow: 0 0 0 3px rgba(255,153,51,0.15);
+    }
+    .btn-activate {
+      background: #FF9933;
+      border: none;
+      color: white;
+      padding: 10px 28px;
+      border-radius: 7px;
+      font-size: 0.93em;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 7px;
+      font-weight: 500;
+    }
+    .btn-activate:hover { background: #e88826; }
+    .result { font-size: 0.8em; min-height: 18px; }
+    .result.ok  { color: #28a745; }
+    .result.err { color: #dc3545; }
+    .footer-note {
+      color: #aaa;
+      font-size: 0.75em;
+      margin-top: 18px;
+      border-top: 1px solid #eee;
+      padding-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="../assets/img/updflogo.png" class="logo" onerror="this.style.display='none'">
+    <div class="trial-badge">Trial Period Expired</div>
+    <h4>Activation Required</h4>
+    <p class="sub">
+      Your 14-day trial has ended.<br>
+      Contact Twelveinks Company Limited to activate this installation.
+    </p>
+
+    <div class="id-block">
+      <label>Your Machine ID — provide this to Twelveinks when requesting activation</label>
+      <div class="id-row">
+        <input type="text" id="machineId" readonly value="Loading…">
+        <button onclick="copyId(this)">Copy</button>
+      </div>
+    </div>
+
+    <input type="text" class="key-input" id="activationKey"
+           placeholder="ACTIVATION KEY"
+           autocomplete="off" spellcheck="false"
+           oninput="this.value=this.value.toUpperCase()">
+    <button class="btn-activate" onclick="activate()">Activate</button>
+    <div class="result" id="result"></div>
+
+    <div class="footer-note">
+      Med Scope Report v3.1.1 &nbsp;&mdash;&nbsp; Twelveinks Company Limited
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer, clipboard } = require('electron');
+
+    ipcRenderer.invoke('advanced:get-status').then(data => {
+      document.getElementById('machineId').value = data.machineId;
+    });
+
+    function copyId(btn) {
+      clipboard.writeText(document.getElementById('machineId').value);
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    }
+
+    async function activate() {
+      const key = document.getElementById('activationKey').value.trim();
+      const msg = document.getElementById('result');
+      if (!key) {
+        msg.className = 'result err';
+        msg.textContent = 'Please enter an activation key.';
+        return;
+      }
+      const result = await ipcRenderer.invoke('advanced:activate', key);
+      if (result.success) {
+        msg.className = 'result ok';
+        msg.textContent = '✓ Activated successfully! Loading the application…';
+        setTimeout(() => ipcRenderer.send('license:restart-app'), 1800);
+      } else {
+        msg.className = 'result err';
+        msg.textContent = '✗ Invalid key. Please check and try again.';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -4,6 +4,7 @@ const fs = require('fs');
 const { app, BrowserWindow, ipcMain, dialog, Menu, screen } = require('electron');
 const electronRemote = require('@electron/remote/main');
 const { startDicomServices, stopDicomServices, updateWorklist } = require('./main-process/dicom/dicomServer');
+const license = require('./lib/license');
 
 // Initialize electron remote
 electronRemote.initialize();
@@ -139,11 +140,40 @@ function initialize() {
         mainWindow.setFullScreen(false);
       }
     });
+
+    // Advanced Administration Panel — Ctrl+Shift+5 (restricted access)
+    let advancedWindow = null;
+    localShortcut.register(mainWindow, 'Ctrl+Shift+5', () => {
+      if (advancedWindow && !advancedWindow.isDestroyed()) {
+        advancedWindow.focus();
+        return;
+      }
+      advancedWindow = new BrowserWindow({
+        width: 660,
+        height: 600,
+        resizable: false,
+        title: 'Advanced Panel',
+        alwaysOnTop: true,
+        webPreferences: {
+          nodeIntegration: true,
+          contextIsolation: false,
+          enableRemoteModule: false
+        }
+      });
+      advancedWindow.setMenu(null);
+      advancedWindow.loadURL('file://' + path.join(getAppPath(), 'sections/advanced.html'));
+      advancedWindow.on('closed', () => { advancedWindow = null; });
+    });
+
     // Load the index page which handles templates
     const indexPath = path.join(getAppPath(), 'index.html');
     console.log('Loading initial page from:', indexPath);
 
-    mainWindow.loadURL(`file://${indexPath}`);
+    const licStatus = license.getLicenseStatus();
+    const startUrl = licStatus.expired
+      ? 'file://' + path.join(getAppPath(), 'sections/license.html')
+      : `file://${indexPath}`;
+    mainWindow.loadURL(startUrl);
 
     // Add error handler for page load failures
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
@@ -221,6 +251,50 @@ function loadDemos() {
 // so the EPK-i8020c can display the patient on its touchscreen
 ipcMain.on('dicom:update-worklist', (event, patient) => {
   updateWorklist(patient);
+});
+
+// Advanced panel — get current license + feature status
+ipcMain.handle('advanced:get-status', () => {
+  const settings = require('./lib/settings');
+  return {
+    license:   license.getLicenseStatus(),
+    machineId: license.getMachineId(),
+    features: {
+      featureEndoscopyReports: settings.get('featureEndoscopyReports') !== false,
+      featureReferralReports:  settings.get('featureReferralReports')  !== false,
+      featureOperationReports: settings.get('featureOperationReports') !== false,
+      dicomEnabled:            !!settings.get('dicomEnabled'),
+    }
+  };
+});
+
+// Advanced panel — activate license
+ipcMain.handle('advanced:activate', (event, key) => {
+  const success = license.activate(key);
+  return { success };
+});
+
+// Advanced panel — generate key for current machine (developer use)
+ipcMain.handle('advanced:generate-key', () => {
+  return license.generateKeyForMachine(license.getMachineId());
+});
+
+// Advanced panel — toggle a feature flag
+ipcMain.on('advanced:set-feature', (event, { key, value }) => {
+  const settings = require('./lib/settings');
+  settings.set(key, value);
+  if (key === 'dicomEnabled') {
+    stopDicomServices();
+    if (value) startDicomServices();
+  }
+});
+
+// License page — reload into login after successful activation
+ipcMain.on('license:restart-app', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win && !win.isDestroyed()) {
+    win.loadURL('file://' + path.join(getAppPath(), 'index.html'));
+  }
 });
 
 // Handle opening sections from settings
@@ -459,6 +533,10 @@ const windows = {
 
 // Handle report creation request
 ipcMain.on('openReportCreation', (event, data) => {
+  if (require('./lib/settings').get('featureEndoscopyReports') === false) {
+    dialog.showErrorBox('Feature Disabled', 'Endoscopy and colonoscopy reports are currently disabled.');
+    return;
+  }
   // Store reference to the form window
   windows.form = BrowserWindow.getAllWindows().find(window => {
     const url = window.webContents.getURL();
@@ -579,6 +657,10 @@ ipcMain.on('getAllReports', (event) => {
   
 });// Save Referral as PDF
 ipcMain.on('saveReferralAsPDF', async (event, patientInfo) => {
+  if (require('./lib/settings').get('featureReferralReports') === false) {
+    dialog.showErrorBox('Feature Disabled', 'Referral reports are currently disabled.');
+    return;
+  }
   const { dialog } = require('electron');
   const { savePDFAndRecord } = require('./lib/report-helpers');
   const win = BrowserWindow.fromWebContents(event.sender);
@@ -635,6 +717,10 @@ ipcMain.on('saveReferralAsPDF', async (event, patientInfo) => {
 
 // Save Operation Report as PDF
 ipcMain.on('saveOperationAsPDF', async (event, patientInfo) => {
+  if (require('./lib/settings').get('featureOperationReports') === false) {
+    dialog.showErrorBox('Feature Disabled', 'Operation reports are currently disabled.');
+    return;
+  }
   const { dialog } = require('electron');
   const { savePDFAndRecord } = require('./lib/report-helpers');
   const win = BrowserWindow.fromWebContents(event.sender);
