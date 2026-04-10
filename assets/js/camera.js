@@ -176,6 +176,16 @@ function stopMediaTracks(stream) {
 
 // Add event listener for modal closing
 document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function (e) {
+  // Reset DICOM standby panel back to hidden
+  const dicomStandby = document.getElementById('dicom-standby');
+  const captureBtnWrap = document.getElementById('capture-btn-wrap');
+  const cameraViewEl = document.getElementById('camera-view');
+  const modalLabel = document.getElementById('exampleModalLabel');
+  if (dicomStandby) dicomStandby.style.display = 'none';
+  if (captureBtnWrap) captureBtnWrap.style.display = '';
+  if (cameraViewEl) cameraViewEl.style.display = 'block';
+  if (modalLabel) modalLabel.textContent = 'Camera';
+
   if (typeof currentStream !== 'undefined') {
     stopMediaTracks(currentStream);
     video.srcObject = null;
@@ -199,8 +209,36 @@ function gotDevices(mediaDevices) {
     }
   });
   select.remove(0);
+  // Append DICOM option if enabled in settings
+  try {
+    const settings = require('../../lib/settings.js');
+    if (settings.get('dicomEnabled')) {
+      const dicomOpt = document.createElement('option');
+      dicomOpt.value = '__dicom__';
+      dicomOpt.textContent = 'DICOM — Pentax EPK-i8020c';
+      select.appendChild(dicomOpt);
+    }
+  } catch (e) { /* settings unavailable */ }
 }
 button.addEventListener('click', event => {
+  // DICOM mode — skip webcam entirely, show standby panel
+  if (select.value === '__dicom__') {
+    if (typeof currentStream !== 'undefined') {
+      stopMediaTracks(currentStream);
+      video.srcObject = null;
+      currentStream = undefined;
+    }
+    const cameraViewEl = document.getElementById('camera-view');
+    const captureBtnWrap = document.getElementById('capture-btn-wrap');
+    const dicomStandby = document.getElementById('dicom-standby');
+    const modalLabel = document.getElementById('exampleModalLabel');
+    if (cameraViewEl) cameraViewEl.style.display = 'none';
+    if (captureBtnWrap) captureBtnWrap.style.display = 'none';
+    if (dicomStandby) dicomStandby.style.display = 'block';
+    if (modalLabel) modalLabel.textContent = 'DICOM Capture — Pentax EPK-i8020c';
+    return;
+  }
+
   if (typeof currentStream !== 'undefined') {
     stopMediaTracks(currentStream);
   }

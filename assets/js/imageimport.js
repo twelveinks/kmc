@@ -33,6 +33,19 @@ let thumbnails = document.getElementsByClassName('img-container');
             thumbnails[slot].firstElementChild.src = dataUrl;
             collector[slot] = dataUrl;
 
+            // Update DICOM standby panel status indicator (if visible)
+            const dot        = document.getElementById('dicom-dot');
+            const statusText = document.getElementById('dicom-status-text');
+            const lastRecvEl = document.getElementById('dicom-last-received');
+            if (dot)        { dot.style.background = '#28a745'; }
+            if (statusText) { statusText.textContent = 'Image received!'; }
+            if (lastRecvEl) { lastRecvEl.textContent = 'Last received: ' + new Date().toLocaleTimeString(); }
+            // Reset dot after 3 seconds
+            setTimeout(() => {
+                if (dot)        dot.style.background = '#aaa';
+                if (statusText) statusText.textContent = 'Waiting for scope images…';
+            }, 3000);
+
             // Auto-fill patient fields if they are currently empty
             const firstNameEl = document.getElementById('firstName');
             const lastNameEl  = document.getElementById('lastName');

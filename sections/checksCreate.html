@@ -354,13 +354,29 @@
                                         </button>
                                     </div>
                                     <div class="modal-body" id="camerabody">
-                                        <span>
+                                        <span id="capture-btn-wrap">
                                             <button type="button" id="capture" class="btn"><img
                                                     src="../assets/img/camera.png" alt="Take Photo"
                                                     aria-label="Take Photo"></button>
                                         </span>
                                         <div id="camera-view">
                                             <video autoplay id="video"></video>
+                                        </div>
+                                        <!-- DICOM standby panel -->
+                                        <div id="dicom-standby" style="display:none; text-align:center; padding:30px 20px;">
+                                            <div style="font-size:3em; margin-bottom:10px;">&#x1F4E1;</div>
+                                            <h6 style="color:#FF9933; font-weight:600;">DICOM — Pentax EPK-i8020c</h6>
+                                            <p style="color:#555; font-size:0.88em; margin-bottom:16px;">
+                                                Images sent from the scope processor will appear<br>automatically in the thumbnail slots below.
+                                            </p>
+                                            <div id="dicom-live-indicator" style="display:inline-flex; align-items:center; gap:8px;
+                                                background:#f8f9fa; border:1px solid #dee2e6; border-radius:20px;
+                                                padding:6px 16px; font-size:0.82em; color:#666;">
+                                                <span id="dicom-dot" style="width:10px;height:10px;border-radius:50%;
+                                                    background:#aaa; display:inline-block;"></span>
+                                                <span id="dicom-status-text">Waiting for scope images…</span>
+                                            </div>
+                                            <div id="dicom-last-received" style="margin-top:12px; font-size:0.78em; color:#888;"></div>
                                         </div>
                                         <canvas id="canvas" style="display: none"></canvas>
 
