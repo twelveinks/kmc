@@ -122,6 +122,7 @@ radio1.addEventListener('change', () => {
 
 //doctors advice
 const doctorsAdvice = document.getElementById('doctors-advice');
+const medicationAdministered = document.getElementById('medication-administered');
 
 
 
@@ -367,6 +368,7 @@ function createPDF(reportType) {
             repo_scopic_findings: scopicFindings.value,
             repo_scopic_diagnosis: scopicDiagnosis.value,
             repo_biopay: biopay.value,
+            repo_medication_administered: medicationAdministered ? medicationAdministered.value : '',
             repo_doctors_advice: doctorsAdvice.value,
             repo_caption1: caption1.value,
             repo_caption6: caption6.value,
@@ -450,6 +452,7 @@ function createPDF(reportType) {
             repo_scopic_findings: scopicFindings.value,
             repo_scopic_diagnosis: scopicDiagnosis.value,
             repo_biopay: biopay.value,
+            repo_medication_administered: medicationAdministered ? medicationAdministered.value : '',
             repo_doctors_advice: doctorsAdvice.value,
             repo_caption1: caption1.value,
             repo_caption6: caption6.value,

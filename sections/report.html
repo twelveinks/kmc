@@ -216,6 +216,7 @@
             var repo_scopic_findings = document.getElementById('repo-endoscopic-findings');
             var repo_scopic_diagnosis = document.getElementById('repo-endoscopic-diagnosis');
             var repo_biopay = document.getElementById('repo-Biopsy-site');
+            var repo_medication_administered = document.getElementById('repo-medication-administered');
             var repo_doctors_advice = document.getElementById('repo-doctors-advise');
             var fig1Caption = document.getElementById('fig1Caption');
             var fig2Caption = document.getElementById('fig2Caption');
@@ -232,6 +233,7 @@
             repo_name.innerHTML = data.repo_name;
             repo_sex.innerHTML = data.repo_sex;
             repo_biopay.innerHTML = data.repo_biopay;
+            if (repo_medication_administered) repo_medication_administered.innerHTML = data.repo_medication_administered || '';
 
             repo_preOp.innerHTML = data.repo_preOp;
             repo_scopic_findings.innerHTML = data.repo_scopic_findings;
@@ -443,6 +445,14 @@
                                 <td class="repo-Biopsy-site">
                                     <span id="repo-Biopsy-site">
                                     </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="white-space: nowrap;">
+                                    Medication Administered :
+                                </td>
+                                <td>
+                                    <span id="repo-medication-administered" style="font-size: 0.85em;"></span>
                                 </td>
                             </tr>
                             <tr class="repo-doctor-advise">
