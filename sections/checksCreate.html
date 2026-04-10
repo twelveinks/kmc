@@ -362,21 +362,26 @@
                                         <div id="camera-view">
                                             <video autoplay id="video"></video>
                                         </div>
-                                        <!-- DICOM standby panel -->
-                                        <div id="dicom-standby" style="display:none; text-align:center; padding:30px 20px;">
-                                            <div style="font-size:3em; margin-bottom:10px;">&#x1F4E1;</div>
-                                            <h6 style="color:#FF9933; font-weight:600;">DICOM — Pentax EPK-i8020c</h6>
-                                            <p style="color:#555; font-size:0.88em; margin-bottom:16px;">
-                                                Images sent from the scope processor will appear<br>automatically in the thumbnail slots below.
-                                            </p>
-                                            <div id="dicom-live-indicator" style="display:inline-flex; align-items:center; gap:8px;
-                                                background:#f8f9fa; border:1px solid #dee2e6; border-radius:20px;
-                                                padding:6px 16px; font-size:0.82em; color:#666;">
-                                                <span id="dicom-dot" style="width:10px;height:10px;border-radius:50%;
-                                                    background:#aaa; display:inline-block;"></span>
-                                                <span id="dicom-status-text">Waiting for scope images…</span>
+                                        <!-- DICOM live gallery panel -->
+                                        <div id="dicom-standby" style="display:none; padding:10px 8px 6px;">
+                                            <!-- Compact status bar -->
+                                            <div style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                                                <span style="color:#FF9933; font-weight:600; font-size:0.83em;">&#x1F4E1; DICOM &mdash; Pentax EPK-i8020c</span>
+                                                <div style="display:inline-flex; align-items:center; gap:6px; background:#f8f9fa; border:1px solid #dee2e6; border-radius:20px; padding:4px 12px; font-size:0.78em; color:#666;">
+                                                    <span id="dicom-dot" style="width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block;flex-shrink:0;"></span>
+                                                    <span id="dicom-status-text">Waiting for scope images&hellip;</span>
+                                                </div>
+                                                <span id="dicom-last-received" style="font-size:0.75em; color:#999;"></span>
                                             </div>
-                                            <div id="dicom-last-received" style="margin-top:12px; font-size:0.78em; color:#888;"></div>
+                                            <!-- Scrollable image gallery — images added here by imageimport.js as they arrive -->
+                                            <div id="dicom-gallery-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-height:320px; overflow-y:auto; padding:6px; border:1px solid #e9ecef; border-radius:6px; background:#fafafa;">
+                                                <div id="dicom-gallery-empty" style="grid-column:1/-1; text-align:center; padding:28px; color:#aaa; font-size:0.83em;">
+                                                    Images from the scope processor will appear here
+                                                </div>
+                                            </div>
+                                            <p style="font-size:0.73em; color:#888; text-align:center; margin:6px 0 0;">
+                                                &#10003; Check images to include in the report, then close this window.
+                                            </p>
                                         </div>
                                         <canvas id="canvas" style="display: none"></canvas>
 

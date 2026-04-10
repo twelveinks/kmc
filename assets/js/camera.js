@@ -176,6 +176,26 @@ function stopMediaTracks(stream) {
 
 // Add event listener for modal closing
 document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function (e) {
+  // If closing from DICOM gallery mode — load checked images into report thumbnail slots
+  const dicomGrid = document.getElementById('dicom-gallery-grid');
+  if (dicomGrid) {
+    const checkedItems = dicomGrid.querySelectorAll('.dicom-include-cb:checked');
+    if (checkedItems.length > 0) {
+      let slotIdx = 0;
+      checkedItems.forEach(cb => {
+        if (slotIdx >= thumbnails.length) return;
+        const galleryItem = cb.closest('.dicom-gallery-item');
+        if (galleryItem && galleryItem.dataset.src) {
+          thumbnails[slotIdx].firstElementChild.src = galleryItem.dataset.src;
+          collector[slotIdx] = galleryItem.dataset.src;
+          slotIdx++;
+        }
+      });
+    }
+    // Clear gallery ready for next session
+    dicomGrid.innerHTML = '<div id="dicom-gallery-empty" style="grid-column:1/-1; text-align:center; padding:28px; color:#aaa; font-size:0.83em;">Images from the scope processor will appear here</div>';
+  }
+
   // Reset DICOM standby panel back to hidden
   const dicomStandby = document.getElementById('dicom-standby');
   const captureBtnWrap = document.getElementById('capture-btn-wrap');

@@ -15,42 +15,31 @@ let thumbnails = document.getElementsByClassName('img-container');
 
     ipcRenderer.on('dicom:image-received', (event, data) => {
         try {
-            // Read the saved JPEG and convert to data URL for the thumbnail
-            const buffer   = fs.readFileSync(data.filePath);
-            const dataUrl  = 'data:image/jpeg;base64,' + buffer.toString('base64');
+            const nodePath = require('path');
 
-            // Find the first empty slot
-            let slot = -1;
-            for (let i = 0; i < thumbnails.length; i++) {
-                const src = thumbnails[i].firstElementChild.src;
-                if (!src || src.includes('noimage.jpg') || src === '') {
-                    slot = i;
-                    break;
+            // Read the saved JPEG and convert to data URL
+            const buffer  = fs.readFileSync(data.filePath);
+            const dataUrl = 'data:image/jpeg;base64,' + buffer.toString('base64');
+
+            // ── Save a copy to the patient-named folder ──────────────────────
+            try {
+                const settingsLib   = require('../lib/settings.js');
+                const photoSavePath = settingsLib.get('photoSavePath');
+                if (photoSavePath) {
+                    const fn = document.getElementById('firstName');
+                    const ln = document.getElementById('lastName');
+                    const patientName = ((fn ? fn.value : '') + ' ' + (ln ? ln.value : '')).trim() || 'DICOM-Patient';
+                    const patientDir  = nodePath.join(photoSavePath, patientName);
+                    fs.mkdirSync(patientDir, { recursive: true });
+                    const destFile = nodePath.join(patientDir, nodePath.basename(data.filePath));
+                    if (!fs.existsSync(destFile)) fs.copyFileSync(data.filePath, destFile);
                 }
-            }
-            if (slot === -1) slot = thumbnails.length - 1; // fall back to last slot
+            } catch (e) { console.warn('[DICOM] Could not copy to patient folder:', e.message); }
 
-            thumbnails[slot].firstElementChild.src = dataUrl;
-            collector[slot] = dataUrl;
-
-            // Update DICOM standby panel status indicator (if visible)
-            const dot        = document.getElementById('dicom-dot');
-            const statusText = document.getElementById('dicom-status-text');
-            const lastRecvEl = document.getElementById('dicom-last-received');
-            if (dot)        { dot.style.background = '#28a745'; }
-            if (statusText) { statusText.textContent = 'Image received!'; }
-            if (lastRecvEl) { lastRecvEl.textContent = 'Last received: ' + new Date().toLocaleTimeString(); }
-            // Reset dot after 3 seconds
-            setTimeout(() => {
-                if (dot)        dot.style.background = '#aaa';
-                if (statusText) statusText.textContent = 'Waiting for scope images…';
-            }, 3000);
-
-            // Auto-fill patient fields if they are currently empty
+            // ── Auto-fill patient fields if still empty ──────────────────────
             const firstNameEl = document.getElementById('firstName');
             const lastNameEl  = document.getElementById('lastName');
             const patientNoEl = document.getElementById('patient_no');
-
             if (data.patientName && firstNameEl && !firstNameEl.value) {
                 const parts = data.patientName.split('^'); // DICOM: LAST^FIRST
                 if (lastNameEl)  lastNameEl.value  = parts[0] || '';
@@ -59,6 +48,64 @@ let thumbnails = document.getElementsByClassName('img-container');
             if (data.patientId && patientNoEl && !patientNoEl.value) {
                 patientNoEl.value = data.patientId;
             }
+
+            // ── Update status dot ────────────────────────────────────────────
+            const dot        = document.getElementById('dicom-dot');
+            const statusText = document.getElementById('dicom-status-text');
+            const lastRecvEl = document.getElementById('dicom-last-received');
+            if (dot)        dot.style.background = '#28a745';
+            if (statusText) statusText.textContent = 'Image received!';
+            if (lastRecvEl) lastRecvEl.textContent = 'Last: ' + new Date().toLocaleTimeString();
+            setTimeout(() => {
+                if (dot)        dot.style.background = '#aaa';
+                if (statusText) statusText.textContent = 'Waiting for scope images…';
+            }, 3000);
+
+            // ── Gallery mode (modal is open in DICOM mode) ───────────────────
+            // Add image to the gallery grid; doctor picks which ones to include on close.
+            const dicomStandby = document.getElementById('dicom-standby');
+            if (dicomStandby && dicomStandby.style.display !== 'none') {
+                const grid     = document.getElementById('dicom-gallery-grid');
+                const emptyMsg = document.getElementById('dicom-gallery-empty');
+                if (emptyMsg) emptyMsg.remove();
+
+                const item = document.createElement('div');
+                item.className = 'dicom-gallery-item';
+                item.dataset.src = dataUrl;
+                item.style.cssText = 'display:flex;flex-direction:column;align-items:center;';
+                const imgEl = document.createElement('img');
+                imgEl.src = dataUrl;
+                imgEl.style.cssText = 'width:100%;height:80px;object-fit:cover;border-radius:4px;border:2px solid #dee2e6;cursor:pointer;';
+                imgEl.addEventListener('click', function () {
+                    this.style.borderColor = this.style.borderColor === 'rgb(255, 153, 51)' ? '#dee2e6' : '#FF9933';
+                });
+                const label = document.createElement('label');
+                label.style.cssText = 'font-size:0.72em;margin-top:3px;display:flex;align-items:center;gap:4px;cursor:pointer;';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.className = 'dicom-include-cb';
+                cb.checked = true;
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(' Include'));
+                item.appendChild(imgEl);
+                item.appendChild(label);
+                if (grid) grid.appendChild(item);
+                return; // Don't auto-fill slots yet — doctor picks on close
+            }
+
+            // ── Background mode (modal closed) → auto-fill thumbnail slots ───
+            let slot = -1;
+            for (let i = 0; i < thumbnails.length; i++) {
+                const src = thumbnails[i].firstElementChild.src;
+                if (!src || src.includes('noimage.jpg') || src === '') {
+                    slot = i;
+                    break;
+                }
+            }
+            if (slot === -1) slot = thumbnails.length - 1;
+            thumbnails[slot].firstElementChild.src = dataUrl;
+            collector[slot] = dataUrl;
+
         } catch (err) {
             console.error('[DICOM] Error loading received image:', err.message);
         }
