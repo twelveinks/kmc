@@ -415,6 +415,40 @@
         <script src="../assets/js/imageprocessing.js"></script>
         <script src="../assets/js/camera.js"></script>
         <script src="../assets/js/imageimport.js"></script>
+        <script>
+            // ── DICOM MWL Sync ───────────────────────────────────────────────────────────
+            // Sends the current patient data to the main process on each keystroke so the
+            // Pentax EPK-i8020c can display the patient on its touchscreen before the scope.
+            (function setupMwlSync() {
+                const { ipcRenderer } = require('electron');
+
+                function syncWorklist() {
+                    const firstName = document.getElementById('firstName').value.trim();
+                    const lastName  = document.getElementById('lastName').value.trim();
+                    if (!firstName || !lastName) return;
+
+                    const genderEl  = document.getElementById('gender');
+                    const genderVal = genderEl ? genderEl.value : '';
+                    const sex = genderVal === 'Male' ? 'M' : (genderVal === 'Female' ? 'F' : 'O');
+
+                    ipcRenderer.send('dicom:update-worklist', {
+                        patientName:   lastName + '^' + firstName,
+                        patientId:     document.getElementById('patient_no').value.trim(),
+                        dob:           '',
+                        sex:           sex,
+                        schedDate:     new Date().toISOString().slice(0, 10).replace(/-/g, ''),
+                        procedureDesc: 'ENDOSCOPY',
+                        spssId:        Date.now().toString(),
+                    });
+                }
+
+                ['firstName', 'lastName', 'patient_no'].forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener('input', syncWorklist);
+                });
+            }());
+            // ────────────────────────────────────────────────────────────────────────────
+        </script>
 </body>
 
 </html>

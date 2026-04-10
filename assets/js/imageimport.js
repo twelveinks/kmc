@@ -5,6 +5,65 @@ const fileInput = document.getElementById('inputGroupFile01');
 let fileList = [];
 let collector = [];
 let thumbnails = document.getElementsByClassName('img-container');
+
+// ── DICOM Integration ────────────────────────────────────────────────────────
+// Listen for images pushed from the Pentax EPK-i8020c via the PACS receiver.
+// Each received image is loaded into the next empty thumbnail slot automatically.
+(function setupDicomListener() {
+    const { ipcRenderer } = require('electron');
+    const fs = require('fs');
+
+    ipcRenderer.on('dicom:image-received', (event, data) => {
+        try {
+            // Read the saved JPEG and convert to data URL for the thumbnail
+            const buffer   = fs.readFileSync(data.filePath);
+            const dataUrl  = 'data:image/jpeg;base64,' + buffer.toString('base64');
+
+            // Find the first empty slot
+            let slot = -1;
+            for (let i = 0; i < thumbnails.length; i++) {
+                const src = thumbnails[i].firstElementChild.src;
+                if (!src || src.includes('noimage.jpg') || src === '') {
+                    slot = i;
+                    break;
+                }
+            }
+            if (slot === -1) slot = thumbnails.length - 1; // fall back to last slot
+
+            thumbnails[slot].firstElementChild.src = dataUrl;
+            collector[slot] = dataUrl;
+
+            // Auto-fill patient fields if they are currently empty
+            const firstNameEl = document.getElementById('firstName');
+            const lastNameEl  = document.getElementById('lastName');
+            const patientNoEl = document.getElementById('patient_no');
+
+            if (data.patientName && firstNameEl && !firstNameEl.value) {
+                const parts = data.patientName.split('^'); // DICOM: LAST^FIRST
+                if (lastNameEl)  lastNameEl.value  = parts[0] || '';
+                if (firstNameEl) firstNameEl.value = parts[1] || '';
+            }
+            if (data.patientId && patientNoEl && !patientNoEl.value) {
+                patientNoEl.value = data.patientId;
+            }
+        } catch (err) {
+            console.error('[DICOM] Error loading received image:', err.message);
+        }
+    });
+
+    ipcRenderer.on('dicom:procedure-completed', (event, data) => {
+        if (data.status === 'COMPLETED') {
+            const proceed = window.confirm(
+                'The scope procedure has been marked complete on the processor.\n\nReview and save the report now?'
+            );
+            if (proceed) {
+                const submitBtn = document.getElementById('proceed');
+                if (submitBtn) submitBtn.click();
+            }
+        }
+    });
+}());
+// ────────────────────────────────────────────────────────────────────────────
 //adding a listener to the file upload button.
 fileInput.addEventListener('change', function (event) {
     fileList = [];

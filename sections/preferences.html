@@ -148,6 +148,54 @@
             <button class="btn btn-secondary" onclick="resetToDefaults()">Reset to Defaults</button>
             <span class="save-indicator" id="saveIndicator">Settings saved!</span>
         </div>
+
+        <!-- DICOM Integration Settings (Pentax EPK-i8020c) -->
+        <div class="preferences-section mt-4">
+            <div class="section-title">DICOM Integration (Pentax EPK-i8020c)</div>
+
+            <div class="preference-item">
+                <div class="preference-label">Enable DICOM Integration</div>
+                <div class="preference-description">
+                    Allows the EPK-i8020c to push images directly to this application, serve the patient worklist to the processor, and receive procedure start/end signals.
+                    <br><strong>Restart the application after changing this setting.</strong>
+                </div>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="dicomEnabled" onchange="saveDicomEnabled()">
+                    <label class="form-check-label" for="dicomEnabled">Enable</label>
+                </div>
+            </div>
+
+            <div class="preference-item mt-3">
+                <div class="preference-label">AE Title</div>
+                <div class="preference-description">This application's DICOM AE Title (max 16 chars). Must match the PACS AE Title configured on the EPK-i8020c.</div>
+                <input type="text" class="form-control" id="dicomAeTitle" maxlength="16" style="max-width:200px;" oninput="saveDicomField('dicomAeTitle', this.value)">
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="preference-label">PACS Port</div>
+                    <div class="preference-description">Port for receiving scope images (C-STORE).</div>
+                    <input type="number" class="form-control" id="dicomPort" min="1024" max="65535" style="max-width:130px;" oninput="saveDicomField('dicomPort', parseInt(this.value))">
+                </div>
+                <div class="col-md-4">
+                    <div class="preference-label">MWL Port</div>
+                    <div class="preference-description">Port for worklist queries (C-FIND).</div>
+                    <input type="number" class="form-control" id="mwlPort" min="1024" max="65535" style="max-width:130px;" oninput="saveDicomField('mwlPort', parseInt(this.value))">
+                </div>
+                <div class="col-md-4">
+                    <div class="preference-label">MPPS Port</div>
+                    <div class="preference-description">Port for procedure status (N-CREATE/N-SET).</div>
+                    <input type="number" class="form-control" id="mppsPort" min="1024" max="65535" style="max-width:130px;" oninput="saveDicomField('mppsPort', parseInt(this.value))">
+                </div>
+            </div>
+
+            <div class="mt-3 p-3" style="background:#f8f9fa; border-radius:6px; font-size:0.88em; color:#555;">
+                <strong>EPK-i8020c Network Setup:</strong> On the processor go to <em>Settings → Network → DICOM</em> and set:<br>
+                PACS IP = this PC's IP &nbsp;|&nbsp; PACS Port = PACS Port above &nbsp;|&nbsp; PACS AE Title = AE Title above<br>
+                MWL IP = this PC's IP &nbsp;|&nbsp; MWL Port = MWL Port above<br>
+                MPPS IP = this PC's IP &nbsp;|&nbsp; MPPS Port = MPPS Port above
+            </div>
+        </div>
     </div>
 
     <script>
@@ -264,6 +312,28 @@
             if (confirm('Are you sure you want to reset all save locations to their default values?')) {
                 settings.resetToDefaults();
                 initializePreferences();
+                initializeDicomPreferences();
+                showSaveIndicator();
+            }
+        }
+
+        // --- DICOM settings ---
+        function initializeDicomPreferences() {
+            document.getElementById('dicomEnabled').checked = !!settings.get('dicomEnabled');
+            document.getElementById('dicomAeTitle').value   = settings.get('dicomAeTitle') || 'MEDSCOPE';
+            document.getElementById('dicomPort').value      = settings.get('dicomPort')    || 4104;
+            document.getElementById('mwlPort').value        = settings.get('mwlPort')      || 4105;
+            document.getElementById('mppsPort').value       = settings.get('mppsPort')     || 4106;
+        }
+
+        function saveDicomEnabled() {
+            settings.set('dicomEnabled', document.getElementById('dicomEnabled').checked);
+            showSaveIndicator();
+        }
+
+        function saveDicomField(key, value) {
+            if (value !== null && value !== undefined && value !== '' && !isNaN(value) || typeof value === 'string') {
+                settings.set(key, value);
                 showSaveIndicator();
             }
         }
@@ -274,6 +344,7 @@
 
         // Initialize on load
         initializePreferences();
+        initializeDicomPreferences();
     </script>
 </body>
 </html>

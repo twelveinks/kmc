@@ -3,6 +3,7 @@ const glob = require('glob');
 const fs = require('fs');
 const { app, BrowserWindow, ipcMain, dialog, Menu, screen } = require('electron');
 const electronRemote = require('@electron/remote/main');
+const { startDicomServices, stopDicomServices, updateWorklist } = require('./main-process/dicom/dicomServer');
 
 // Initialize electron remote
 electronRemote.initialize();
@@ -166,7 +167,11 @@ function initialize() {
       const menu = Menu.buildFromTemplate(template);
       Menu.setApplicationMenu(menu);
     }
-    createWindow()
+    createWindow();
+    startDicomServices();
+  })
+  app.on('before-quit', () => {
+    stopDicomServices();
   })
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -211,6 +216,12 @@ function loadDemos() {
     .filter(file => !file.includes('menus/application-menu.js')) // Exclude the menu file
     .forEach((file) => { require(file) })
 }
+
+// Handle DICOM worklist update — syncs patient data to MWL server
+// so the EPK-i8020c can display the patient on its touchscreen
+ipcMain.on('dicom:update-worklist', (event, patient) => {
+  updateWorklist(patient);
+});
 
 // Handle opening sections from settings
 ipcMain.on('openSection', (event, section) => {
