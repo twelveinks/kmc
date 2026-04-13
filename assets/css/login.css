@@ -41,8 +41,8 @@ section {
 }
 
 .index-template .start-logo img {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: auto;
     margin-bottom: 20px;
 }
 
@@ -239,8 +239,8 @@ section {
 }
 
 .start-logo img {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: auto;
     margin-right: 15px;
 }
 
